@@ -1,0 +1,51 @@
+/* Print stylesheet — finalized in Phase 3 */
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-page,
+  .print-page * {
+    visibility: visible;
+  }
+
+  .screen-only {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 18mm;
+  }
+
+  .print-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 210mm;
+    background: white;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+      "Yu Gothic", sans-serif;
+    font-size: 10pt;
+    color: #000;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
+  tr {
+    page-break-inside: avoid;
+  }
+  .page-break {
+    page-break-after: always;
+  }
+}
+
+@media screen {
+  .print-only {
+    display: none;
+  }
+}
