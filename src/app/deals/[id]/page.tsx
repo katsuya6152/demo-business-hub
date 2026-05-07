@@ -33,16 +33,28 @@ export default function DealDetailPage({ params }: PageProps) {
   const router = useRouter();
   const mounted = useMounted();
 
-  const deal = useDealsStore((s) => s.deals.find((d) => d.id === id));
+  const deals = useDealsStore((s) => s.deals);
   const remove = useDealsStore((s) => s.remove);
-  const customer = useCustomersStore((s) =>
-    deal ? s.customers.find((c) => c.id === deal.customerId) : undefined,
+  const customers = useCustomersStore((s) => s.customers);
+  const allQuotes = useQuotesStore((s) => s.quotes);
+  const allInvoices = useInvoicesStore((s) => s.invoices);
+
+  const deal = useMemo(
+    () => deals.find((d) => d.id === id),
+    [deals, id],
   );
-  const quotes = useQuotesStore((s) =>
-    s.quotes.filter((q) => q.dealId === id),
+  const customer = useMemo(
+    () =>
+      deal ? customers.find((c) => c.id === deal.customerId) : undefined,
+    [customers, deal],
   );
-  const invoices = useInvoicesStore((s) =>
-    s.invoices.filter((inv) => inv.dealId === id),
+  const quotes = useMemo(
+    () => allQuotes.filter((q) => q.dealId === id),
+    [allQuotes, id],
+  );
+  const invoices = useMemo(
+    () => allInvoices.filter((inv) => inv.dealId === id),
+    [allInvoices, id],
   );
 
   const [editOpen, setEditOpen] = useState(false);
