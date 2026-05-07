@@ -78,10 +78,10 @@ export function AiQueryBar() {
   const isRemote = llmConfig.provider !== "offline" && llmConfig.apiKey.trim();
 
   return (
-    <Card className="relative overflow-hidden border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] via-white to-[var(--color-cyan-50)] p-5 ring-1 ring-[var(--color-accent-100)]">
+    <Card className="relative overflow-hidden border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] via-card to-[var(--color-cyan-50)] p-5 ring-1 ring-[var(--color-accent-100)]">
       <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[var(--color-accent-100)] blur-3xl opacity-60" />
       <div className="relative flex items-center gap-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-[var(--color-accent-200)]">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-[var(--color-accent-200)]">
           <Sparkles className="h-4 w-4 text-[var(--color-accent-600)] animate-pulse" />
         </span>
         <p className="text-sm font-semibold text-[var(--color-ink-950)]">
@@ -113,7 +113,7 @@ export function AiQueryBar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="例: 今月の売上は？ / 未入金一覧 / TOP顧客は？"
-          className="h-12 bg-white text-base"
+          className="h-12 bg-card text-base"
           disabled={loading}
           aria-label="AI への質問"
         />
@@ -144,7 +144,7 @@ export function AiQueryBar() {
             <Badge
               variant="outline"
               className={cn(
-                "cursor-pointer bg-white text-xs transition-colors",
+                "cursor-pointer bg-card text-xs transition-colors",
                 loading
                   ? "opacity-50"
                   : "hover:bg-[var(--color-accent-50)] hover:border-[var(--color-accent-600)] hover:text-[var(--color-accent-700)]",
@@ -164,7 +164,7 @@ export function AiQueryBar() {
       )}
 
       {!loading && response && (
-        <div className="mt-4 rounded-lg border border-[var(--color-line)] bg-white p-4">
+        <div className="mt-4 rounded-lg border border-[var(--color-line)] bg-card p-4">
           <div className="prose prose-sm max-w-none text-[var(--color-ink-700)] prose-strong:text-[var(--color-ink-950)] prose-strong:font-semibold prose-li:my-0">
             <ReactMarkdown>{response.text}</ReactMarkdown>
           </div>
@@ -181,7 +181,7 @@ export function AiQueryBar() {
           {history.slice(0, 3).map((h) => (
             <details
               key={h.at}
-              className="rounded-md border border-[var(--color-line)] bg-white p-3 text-sm"
+              className="rounded-md border border-[var(--color-line)] bg-card p-3 text-sm"
             >
               <summary className="cursor-pointer text-[var(--color-ink-700)]">
                 <span className="font-medium">Q.</span> {h.query}

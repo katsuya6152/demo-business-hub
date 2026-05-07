@@ -12,7 +12,7 @@ type StatCardProps = {
 const toneClasses: Record<NonNullable<StatCardProps["tone"]>, string> = {
   default: "",
   accent: "border-[var(--color-accent-200)] bg-[var(--color-accent-50)]",
-  warn: "border-amber-200 bg-amber-50",
+  warn: "border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/30",
   success: "border-[var(--color-cyan-200)] bg-[var(--color-cyan-50)]",
 };
 

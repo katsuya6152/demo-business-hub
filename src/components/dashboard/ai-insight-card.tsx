@@ -53,9 +53,9 @@ export function AiInsightCard() {
   const HeadlineIcon = Headline.icon;
 
   return (
-    <Card className="overflow-hidden border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] via-white to-[var(--color-cyan-50)] p-5 ring-1 ring-[var(--color-accent-100)]">
+    <Card className="overflow-hidden border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] via-card to-[var(--color-cyan-50)] p-5 ring-1 ring-[var(--color-accent-100)]">
       <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-[var(--color-accent-200)]">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-[var(--color-accent-200)]">
           <Sparkles className="h-4 w-4 text-[var(--color-accent-600)]" />
         </span>
         <div className="min-w-0 flex-1">
