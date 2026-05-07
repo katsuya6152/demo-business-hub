@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { performUndoable } from "@/hooks/use-undoable";
 
 import { useQuotesStore } from "@/lib/store/quotes";
 import { useCustomersStore } from "@/lib/store/customers";
@@ -41,6 +42,7 @@ export default function QuotesPage() {
   const quotes = useQuotesStore((s) => s.quotes);
   const customers = useCustomersStore((s) => s.customers);
   const removeQuote = useQuotesStore((s) => s.remove);
+  const setAllQuotes = useQuotesStore((s) => s.setAll);
   const duplicateQuote = useQuotesStore((s) => s.duplicate);
 
   const [query, setQuery] = useState("");
@@ -78,8 +80,15 @@ export default function QuotesPage() {
 
   const confirmDelete = () => {
     if (!pendingDeleteId) return;
-    removeQuote(pendingDeleteId);
-    toast.success("見積を削除しました");
+    const id = pendingDeleteId;
+    const before = useQuotesStore.getState().quotes;
+    performUndoable({
+      before,
+      setAll: setAllQuotes,
+      perform: () => removeQuote(id),
+      message: "見積を削除しました",
+      description: "「元に戻す」で取り消せます。",
+    });
     setPendingDeleteId(null);
   };
 

@@ -5,10 +5,12 @@ import { useIndustry } from "@/hooks/use-industry";
 import { INDUSTRY_LABELS, INDUSTRY_EMOJIS } from "@/lib/types/industry";
 import { useSettingsStore } from "@/lib/store/settings";
 import { AiQueryBar } from "./ai-query-bar";
+import { AiInsightCard } from "./ai-insight-card";
 import { KpiCards } from "./kpi-cards";
 import { RevenueChart } from "./revenue-chart";
 import { PipelineSummary } from "./pipeline-summary";
 import { RecentActivity } from "./recent-activity";
+import { CohortChart } from "./cohort-chart";
 
 export function DashboardContent() {
   const industry = useIndustry();
@@ -30,12 +32,16 @@ export function DashboardContent() {
 
       <AiQueryBar />
 
+      <AiInsightCard />
+
       <KpiCards />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <RevenueChart />
         <PipelineSummary />
       </div>
+
+      <CohortChart />
 
       <RecentActivity />
     </div>

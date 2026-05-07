@@ -25,6 +25,15 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useSettingsStore } from "@/lib/store/settings";
 import { resetAllData, clearAllData } from "@/lib/store";
 import {
+  useLlmConfigStore,
+  LLM_PROVIDER_LABELS,
+  LLM_DEFAULT_MODELS,
+  isLlmReady,
+  type LlmProvider,
+} from "@/lib/ai/llm-config";
+import { testLlmConnection } from "@/lib/ai/llm-client";
+import { Sparkles } from "lucide-react";
+import {
   type Industry,
   INDUSTRIES,
   INDUSTRY_LABELS,
@@ -51,6 +60,15 @@ export default function SettingsPage() {
   const [pendingIndustry, setPendingIndustry] = useState<Industry | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
   const [clearOpen, setClearOpen] = useState(false);
+  const llmConfig = useLlmConfigStore((s) => s.config);
+  const setLlmProvider = useLlmConfigStore((s) => s.setProvider);
+  const setLlmApiKey = useLlmConfigStore((s) => s.setApiKey);
+  const setLlmModel = useLlmConfigStore((s) => s.setModel);
+  const [apiKeyDraft, setApiKeyDraft] = useState(llmConfig.apiKey);
+  const [modelDraft, setModelDraft] = useState(
+    llmConfig.model || LLM_DEFAULT_MODELS[llmConfig.provider],
+  );
+  const [testing, setTesting] = useState(false);
 
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companySchema),
@@ -106,6 +124,42 @@ export default function SettingsPage() {
       "全データを削除しました。オンボーディングからやり直してください",
     );
   };
+
+  const handleProviderChange = (next: LlmProvider | null) => {
+    if (!next) return;
+    setLlmProvider(next);
+    setModelDraft(LLM_DEFAULT_MODELS[next] || "");
+  };
+
+  const handleSaveLlm = () => {
+    setLlmApiKey(apiKeyDraft.trim());
+    setLlmModel(modelDraft.trim());
+    toast.success("AI 設定を保存しました");
+  };
+
+  const handleTestLlm = async () => {
+    setTesting(true);
+    const ok = await testLlmConnection({
+      ...llmConfig,
+      apiKey: apiKeyDraft.trim(),
+      model: modelDraft.trim(),
+    });
+    setTesting(false);
+    if (ok) {
+      toast.success(
+        llmConfig.provider === "offline"
+          ? "オフラインモードで動作中です"
+          : `${LLM_PROVIDER_LABELS[llmConfig.provider]} の設定が確認できました`,
+      );
+    } else {
+      toast.error("API キーが未入力です");
+    }
+  };
+
+  const llmReady = isLlmReady({
+    ...llmConfig,
+    apiKey: apiKeyDraft.trim(),
+  });
 
   return (
     <AppShell>
@@ -207,6 +261,110 @@ export default function SettingsPage() {
               <Button type="submit">保存</Button>
             </div>
           </form>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-[var(--color-accent-600)]" />
+            <h2 className="text-base font-semibold text-[var(--color-ink-950)]">
+              AI 設定
+            </h2>
+            <span
+              className={
+                llmReady && llmConfig.provider !== "offline"
+                  ? "ml-auto inline-flex items-center rounded-full bg-[var(--color-cyan-50)] px-2 py-0.5 text-[10px] font-medium text-[var(--color-cyan-700)]"
+                  : "ml-auto inline-flex items-center rounded-full bg-[var(--color-ink-100)] px-2 py-0.5 text-[10px] font-medium text-[var(--color-ink-500)]"
+              }
+            >
+              {llmConfig.provider === "offline"
+                ? "オフライン"
+                : llmReady
+                  ? "API 接続準備完了"
+                  : "API キー未設定"}
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+            ダッシュボードの AI 質問・インサイトの生成方式を選択します。
+          </p>
+          <Separator className="my-4" />
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="llm-provider" className="text-sm">
+                プロバイダ
+              </Label>
+              <Select
+                value={llmConfig.provider}
+                onValueChange={(v) =>
+                  handleProviderChange((v as LlmProvider | null) ?? null)
+                }
+              >
+                <SelectTrigger id="llm-provider" className="w-full md:w-72">
+                  <SelectValue>
+                    {LLM_PROVIDER_LABELS[llmConfig.provider]}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="offline">
+                    {LLM_PROVIDER_LABELS.offline}
+                  </SelectItem>
+                  <SelectItem value="anthropic">
+                    {LLM_PROVIDER_LABELS.anthropic}
+                  </SelectItem>
+                  <SelectItem value="openai">
+                    {LLM_PROVIDER_LABELS.openai}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {llmConfig.provider !== "offline" ? (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="llm-api-key" className="text-sm">
+                    API キー
+                  </Label>
+                  <Input
+                    id="llm-api-key"
+                    type="password"
+                    autoComplete="off"
+                    value={apiKeyDraft}
+                    onChange={(e) => setApiKeyDraft(e.target.value)}
+                    placeholder={
+                      llmConfig.provider === "anthropic"
+                        ? "sk-ant-..."
+                        : "sk-..."
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="llm-model" className="text-sm">
+                    モデル
+                  </Label>
+                  <Input
+                    id="llm-model"
+                    value={modelDraft}
+                    onChange={(e) => setModelDraft(e.target.value)}
+                    placeholder={LLM_DEFAULT_MODELS[llmConfig.provider]}
+                  />
+                </div>
+              </>
+            ) : null}
+
+            <div className="rounded-md bg-[var(--color-bg-soft)] p-3 text-xs text-[var(--color-ink-700)]">
+              ⓘ API キーはブラウザの localStorage にのみ保存され、外部サーバーには送信されません。デモ環境のため実際の API 呼び出しは行わず、応答はキーワードマッチング結果に「{LLM_PROVIDER_LABELS[llmConfig.provider]} 経由」を付記して返します。
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button onClick={handleSaveLlm}>保存</Button>
+              <Button
+                variant="outline"
+                onClick={handleTestLlm}
+                disabled={testing}
+              >
+                {testing ? "テスト中..." : "テスト接続"}
+              </Button>
+            </div>
+          </div>
         </Card>
 
         <Card className="p-6">

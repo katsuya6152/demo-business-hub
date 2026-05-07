@@ -1,8 +1,9 @@
 "use client";
 
-import { use, useMemo } from "react";
+import { use, useMemo, useState } from "react";
 import Link from "next/link";
-import { MoreVertical, Printer, Receipt, Save } from "lucide-react";
+import { FileDown, MoreVertical, Printer, Receipt, Save } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useQuotesStore } from "@/lib/store/quotes";
 import { useCustomersStore } from "@/lib/store/customers";
 import { useSettingsStore } from "@/lib/store/settings";
+import { buildPdfFilename, downloadBlob } from "@/lib/pdf/download";
 
 import { QuoteEditor } from "@/components/quotes/quote-editor";
 import { QuotePrint } from "@/components/quotes/quote-print";
@@ -48,8 +50,34 @@ export default function QuoteDetailPage({
     [customers, quote],
   );
 
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!quote) return;
+    setDownloadingPdf(true);
+    try {
+      const [{ pdf }, { QuotePdf }] = await Promise.all([
+        import("@react-pdf/renderer"),
+        import("@/lib/pdf/quote-pdf"),
+      ]);
+      const blob = await pdf(
+        <QuotePdf quote={quote} customer={customer} company={company} />,
+      ).toBlob();
+      downloadBlob(
+        blob,
+        buildPdfFilename("見積", quote.number, customer?.name),
+      );
+      toast.success("PDF をダウンロードしました");
+    } catch (err) {
+      console.error("PDF generation failed", err);
+      toast.error("PDF の生成に失敗しました");
+    } finally {
+      setDownloadingPdf(false);
+    }
   };
 
   if (!mounted) {
@@ -107,6 +135,16 @@ export default function QuoteDetailPage({
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={handleDownloadPdf}
+                  disabled={downloadingPdf}
+                  className="hidden md:inline-flex"
+                >
+                  <FileDown className="h-4 w-4" />
+                  {downloadingPdf ? "生成中..." : "PDF"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handlePrint}
                   className="hidden md:inline-flex"
                 >
@@ -132,6 +170,13 @@ export default function QuoteDetailPage({
                     }
                   />
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={handleDownloadPdf}
+                      disabled={downloadingPdf}
+                    >
+                      <FileDown className="h-4 w-4" />
+                      {downloadingPdf ? "PDF生成中..." : "PDF ダウンロード"}
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handlePrint}>
                       <Printer className="h-4 w-4" />
                       印刷

@@ -4,6 +4,8 @@ import { use, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  FileDown,
+  Mail,
   Pencil,
   Printer,
   Receipt,
@@ -29,11 +31,14 @@ import {
 import { InvoiceEditor } from "@/components/invoices/invoice-editor";
 import { InvoicePrint } from "@/components/invoices/invoice-print";
 import { PaymentModal } from "@/components/invoices/payment-modal";
+import { DunningEmailModal } from "@/components/invoices/dunning-email-modal";
 import { useInvoicesStore } from "@/lib/store/invoices";
 import { useCustomersStore } from "@/lib/store/customers";
 import { usePaymentsStore } from "@/lib/store/payments";
+import { useSettingsStore } from "@/lib/store/settings";
 import { fmtDate, fmtDateTime } from "@/lib/utils/date";
 import { formatYen } from "@/lib/utils/currency";
+import { buildPdfFilename, downloadBlob } from "@/lib/pdf/download";
 import { PAYMENT_METHOD_LABELS } from "@/lib/types/payment";
 import type { InvoiceStatus } from "@/lib/types/invoice";
 
@@ -49,10 +54,13 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const removeInvoice = useInvoicesStore((s) => s.remove);
   const customers = useCustomersStore((s) => s.customers);
   const payments = usePaymentsStore((s) => s.payments);
+  const company = useSettingsStore((s) => s.settings.company);
 
   const [editing, setEditing] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [dunningOpen, setDunningOpen] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const today = useMemo(() => new Date(), []);
   const invoice = useMemo(
@@ -120,6 +128,34 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
     }
   };
 
+  const handleDownloadPdf = async () => {
+    if (!invoice) return;
+    setDownloadingPdf(true);
+    try {
+      const [{ pdf }, { InvoicePdf }] = await Promise.all([
+        import("@react-pdf/renderer"),
+        import("@/lib/pdf/invoice-pdf"),
+      ]);
+      const blob = await pdf(
+        <InvoicePdf
+          invoice={invoice}
+          customer={customer}
+          company={company}
+        />,
+      ).toBlob();
+      downloadBlob(
+        blob,
+        buildPdfFilename("請求書", invoice.number, customer?.name),
+      );
+      toast.success("PDF をダウンロードしました");
+    } catch (err) {
+      console.error("PDF generation failed", err);
+      toast.error("PDF の生成に失敗しました");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   return (
     <>
       <div className="screen-only">
@@ -149,6 +185,17 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={handleDownloadPdf}
+                      disabled={downloadingPdf}
+                    >
+                      <FileDown className="h-4 w-4" />
+                      <span className="hidden sm:inline">
+                        {downloadingPdf ? "生成中..." : "PDF"}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={handlePrint}
                     >
                       <Printer className="h-4 w-4" />
@@ -163,6 +210,19 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                       <Wallet className="h-4 w-4" />
                       <span className="hidden sm:inline">入金記録</span>
                     </Button>
+                    {effectiveStatus === "overdue" ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDunningOpen(true)}
+                        className="border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
+                      >
+                        <Mail className="h-4 w-4" />
+                        <span className="hidden sm:inline">
+                          督促メール下書き
+                        </span>
+                      </Button>
+                    ) : null}
                     <Button
                       variant="outline"
                       size="sm"
@@ -385,6 +445,11 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           <PaymentModal
             open={payOpen}
             onOpenChange={setPayOpen}
+            invoice={invoice}
+          />
+          <DunningEmailModal
+            open={dunningOpen}
+            onOpenChange={setDunningOpen}
             invoice={invoice}
           />
           <ConfirmDialog

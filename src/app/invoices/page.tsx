@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Search, Receipt } from "lucide-react";
 import { parseISO, isBefore } from "date-fns";
-import { toast } from "sonner";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { performUndoable } from "@/hooks/use-undoable";
 import { InvoiceTable } from "@/components/invoices/invoice-table";
 import { InvoiceSummaryCards } from "@/components/invoices/invoice-summary-cards";
 import { PaymentModal } from "@/components/invoices/payment-modal";
@@ -34,6 +34,7 @@ export default function InvoicesPage() {
   const router = useRouter();
   const invoices = useInvoicesStore((s) => s.invoices);
   const removeInvoice = useInvoicesStore((s) => s.remove);
+  const setAllInvoices = useInvoicesStore((s) => s.setAll);
   const customers = useCustomersStore((s) => s.customers);
 
   const [query, setQuery] = useState("");
@@ -63,8 +64,15 @@ export default function InvoicesPage() {
 
   const handleDelete = () => {
     if (!deleteTarget) return;
-    removeInvoice(deleteTarget.id);
-    toast.success("削除しました");
+    const id = deleteTarget.id;
+    const before = useInvoicesStore.getState().invoices;
+    performUndoable({
+      before,
+      setAll: setAllInvoices,
+      perform: () => removeInvoice(id),
+      message: "請求を削除しました",
+      description: "「元に戻す」で取り消せます。",
+    });
     setDeleteTarget(null);
   };
 

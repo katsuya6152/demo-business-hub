@@ -2,7 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, Users } from "lucide-react";
+import {
+  Download,
+  MoreVertical,
+  Plus,
+  Search,
+  Upload,
+  Users,
+} from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +20,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/shared/empty-state";
 import { CustomerTable } from "@/components/customers/customer-table";
 import { CustomerSheet } from "@/components/customers/customer-sheet";
+import { CsvImportSheet } from "@/components/customers/csv-import-sheet";
 import { useCustomersStore } from "@/lib/store/customers";
 import { useInvoicesStore } from "@/lib/store/invoices";
 import { usePaymentsStore } from "@/lib/store/payments";
@@ -24,6 +38,8 @@ import {
   type Customer,
   type CustomerStatus,
 } from "@/lib/types/customer";
+import { downloadCustomersCSV } from "@/lib/csv/customers-csv";
+import { toast } from "sonner";
 
 type StatusFilter = "all" | CustomerStatus;
 
@@ -36,6 +52,7 @@ export default function CustomersPage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [csvImportOpen, setCsvImportOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -54,6 +71,15 @@ export default function CustomersPage() {
     router.push(`/customers/${customer.id}`);
   };
 
+  const handleExport = () => {
+    if (filtered.length === 0) {
+      toast.error("エクスポート対象の顧客がありません");
+      return;
+    }
+    downloadCustomersCSV(filtered);
+    toast.success(`${filtered.length} 件を CSV にエクスポートしました`);
+  };
+
   return (
     <AppShell>
       <div className="space-y-4 pb-20 sm:space-y-6 sm:pb-0">
@@ -66,14 +92,47 @@ export default function CustomersPage() {
               {customers.length} 件登録 ・ 検索 / フィルタ / ソート可能
             </p>
           </div>
-          {/* Desktop / tablet only — mobile uses FAB */}
-          <Button
-            onClick={() => setSheetOpen(true)}
-            className="hidden sm:inline-flex"
-          >
-            <Plus className="h-4 w-4" />
-            新規顧客
-          </Button>
+          {/* Desktop / tablet：横並びでアクション配置 */}
+          <div className="hidden items-center gap-2 sm:flex">
+            <Button variant="outline" onClick={handleExport}>
+              <Download className="h-4 w-4" />
+              CSV ダウンロード
+            </Button>
+            <Button variant="outline" onClick={() => setCsvImportOpen(true)}>
+              <Upload className="h-4 w-4" />
+              CSV インポート
+            </Button>
+            <Button onClick={() => setSheetOpen(true)}>
+              <Plus className="h-4 w-4" />
+              新規顧客
+            </Button>
+          </div>
+          {/* Mobile：DropdownMenu に CSV 操作を集約。新規追加は FAB */}
+          <div className="flex sm:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="その他のアクション"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleExport}>
+                  <Download className="h-4 w-4" />
+                  CSV ダウンロード
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setCsvImportOpen(true)}>
+                  <Upload className="h-4 w-4" />
+                  CSV インポート
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </header>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
@@ -161,6 +220,7 @@ export default function CustomersPage() {
       </button>
 
       <CustomerSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+      <CsvImportSheet open={csvImportOpen} onOpenChange={setCsvImportOpen} />
     </AppShell>
   );
 }

@@ -3,7 +3,17 @@
 import { use, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, MapPin, Pencil, Phone, Trash2, UserRound } from "lucide-react";
+import {
+  Briefcase,
+  FileText,
+  Mail,
+  MapPin,
+  Pencil,
+  Phone,
+  Receipt,
+  Trash2,
+  UserRound,
+} from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -285,16 +295,28 @@ export default function CustomerDetailPage({
 
         <DetailSection title="関連レコード">
           <Tabs defaultValue="deals">
-            <TabsList className="w-full overflow-x-auto sm:w-fit">
-              <TabsTrigger value="deals">
-                関連案件 ({customerDeals.length})
-              </TabsTrigger>
-              <TabsTrigger value="quotes">
-                見積 ({customerQuotes.length})
-              </TabsTrigger>
-              <TabsTrigger value="invoices">
-                請求 ({customerInvoices.length})
-              </TabsTrigger>
+            <TabsList
+              variant="line"
+              className="-mx-1 inline-flex h-auto w-full gap-1 overflow-x-auto rounded-full border border-[var(--color-line)] bg-[var(--color-bg-soft)] p-1 sm:w-fit"
+            >
+              <PillTab
+                value="deals"
+                icon={<Briefcase className="h-3.5 w-3.5" />}
+                label="関連案件"
+                count={customerDeals.length}
+              />
+              <PillTab
+                value="quotes"
+                icon={<FileText className="h-3.5 w-3.5" />}
+                label="見積"
+                count={customerQuotes.length}
+              />
+              <PillTab
+                value="invoices"
+                icon={<Receipt className="h-3.5 w-3.5" />}
+                label="請求"
+                count={customerInvoices.length}
+              />
             </TabsList>
 
             <TabsContent value="deals" className="mt-4">
@@ -367,5 +389,42 @@ export default function CustomerDetailPage({
         onConfirm={handleDelete}
       />
     </AppShell>
+  );
+}
+
+function PillTab({
+  value,
+  icon,
+  label,
+  count,
+}: {
+  value: string;
+  icon: React.ReactNode;
+  label: string;
+  count: number;
+}) {
+  return (
+    <TabsTrigger
+      value={value}
+      className={cn(
+        "shrink-0 gap-1.5 rounded-full border-transparent px-3 py-1.5 text-xs font-medium text-[var(--color-ink-500)]",
+        "transition-colors",
+        "hover:bg-card/60 hover:text-[var(--color-ink-950)]",
+        "data-active:bg-card data-active:text-[var(--color-accent-700)] data-active:shadow-sm",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-300)]",
+      )}
+    >
+      {icon}
+      <span>{label}</span>
+      <span
+        className={cn(
+          "rounded-full px-1.5 py-px text-[10px] font-mono tabular-nums",
+          "bg-[var(--color-bg-elevated)] text-[var(--color-ink-700)]",
+          "group-data-[state=active]/tab:bg-[var(--color-accent-100)] group-data-[state=active]/tab:text-[var(--color-accent-700)]",
+        )}
+      >
+        {count}
+      </span>
+    </TabsTrigger>
   );
 }

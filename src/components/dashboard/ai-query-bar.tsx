@@ -11,8 +11,17 @@ import { useCustomersStore } from "@/lib/store/customers";
 import { useDealsStore } from "@/lib/store/deals";
 import { useInvoicesStore } from "@/lib/store/invoices";
 import { usePaymentsStore } from "@/lib/store/payments";
-import { generateResponse, type AiResponse } from "@/lib/ai/responder";
+import { type AiResponse } from "@/lib/ai/responder";
 import { QUICK_QUESTIONS } from "@/lib/ai/patterns";
+import {
+  askLlm,
+  LLM_STAGE_MESSAGES,
+  type LlmStage,
+} from "@/lib/ai/llm-client";
+import {
+  useLlmConfigStore,
+  LLM_PROVIDER_LABELS,
+} from "@/lib/ai/llm-config";
 import { cn } from "@/lib/utils";
 
 type HistoryItem = {
@@ -21,46 +30,32 @@ type HistoryItem = {
   at: number;
 };
 
-const LOADING_MESSAGES = [
-  "質問を解析しています...",
-  "データを集計しています...",
-];
-
-function sleep(ms: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, ms));
-}
-
-function randomBetween(min: number, max: number): number {
-  return min + Math.random() * (max - min);
-}
-
 export function AiQueryBar() {
   const customers = useCustomersStore((s) => s.customers);
   const deals = useDealsStore((s) => s.deals);
   const invoices = useInvoicesStore((s) => s.invoices);
   const payments = usePaymentsStore((s) => s.payments);
+  const llmConfig = useLlmConfigStore((s) => s.config);
 
   const [query, setQuery] = useState("");
   const [response, setResponse] = useState<AiResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0]);
+  const [stage, setStage] = useState<LlmStage>("matching");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
 
   const ask = async (input: string) => {
     if (!input.trim() || loading) return;
     setLoading(true);
-    setLoadingMessage(LOADING_MESSAGES[0]);
+    setStage("matching");
     setResponse(null);
 
-    const stage1 = randomBetween(200, 400);
-    const stage2 = randomBetween(400, 1000);
-    await sleep(stage1);
-    setLoadingMessage(LOADING_MESSAGES[1]);
-    await sleep(stage2);
-
     const ctx = { customers, deals, invoices, payments };
-    const res = generateResponse(input, ctx);
+    const res = await askLlm(input, {
+      config: llmConfig,
+      ctx,
+      onStage: (s) => setStage(s),
+    });
     setResponse(res);
     setHistory((prev) => [
       { query: input, response: res, at: Date.now() },
@@ -79,6 +74,9 @@ export function AiQueryBar() {
     ask(q);
   };
 
+  const providerLabel = LLM_PROVIDER_LABELS[llmConfig.provider];
+  const isRemote = llmConfig.provider !== "offline" && llmConfig.apiKey.trim();
+
   return (
     <Card className="relative overflow-hidden border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] via-white to-[var(--color-cyan-50)] p-5 ring-1 ring-[var(--color-accent-100)]">
       <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[var(--color-accent-100)] blur-3xl opacity-60" />
@@ -89,6 +87,16 @@ export function AiQueryBar() {
         <p className="text-sm font-semibold text-[var(--color-ink-950)]">
           業務データに自然言語で質問
         </p>
+        <span
+          className={cn(
+            "ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium",
+            isRemote
+              ? "bg-[var(--color-accent-100)] text-[var(--color-accent-700)]"
+              : "bg-[var(--color-ink-100)] text-[var(--color-ink-500)]",
+          )}
+        >
+          {providerLabel}
+        </span>
         {history.length > 0 && (
           <button
             type="button"
@@ -151,7 +159,7 @@ export function AiQueryBar() {
       {loading && (
         <div className="mt-4 flex items-center gap-2 text-sm text-[var(--color-ink-500)]">
           <Loader2 className="h-4 w-4 animate-spin text-[var(--color-accent-600)]" />
-          <span className="animate-pulse">{loadingMessage}</span>
+          <span className="animate-pulse">{LLM_STAGE_MESSAGES[stage]}</span>
         </div>
       )}
 

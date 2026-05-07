@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { IndustrySwitcher } from "./industry-switcher";
 import { MobileNavTrigger } from "./mobile-nav";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { CommandPaletteTrigger } from "@/components/command-palette/command-palette-trigger";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { useIndustry } from "@/hooks/use-industry";
 import { resetAllData } from "@/lib/store";
 import { INDUSTRY_LABELS } from "@/lib/types/industry";
@@ -43,6 +45,8 @@ export function Header() {
         </span>
       </div>
       <div className="flex items-center gap-2 shrink-0">
+        <CommandPaletteTrigger />
+        <ThemeToggle />
         <IndustrySwitcher />
         <Button
           variant="outline"
