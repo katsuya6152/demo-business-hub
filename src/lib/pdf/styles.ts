@@ -6,20 +6,23 @@
  */
 import { Font, StyleSheet } from "@react-pdf/renderer";
 
-// Register Noto Sans JP for Japanese text. Subset hash URLs from Google Fonts
-// (fonts.gstatic.com). These contain the common-Japanese subset which
-// covers kana + frequently used kanji — sufficient for quotes/invoices.
+// Register Noto Sans JP for Japanese text.
+// Files are bundled under /public/fonts and served from the same origin
+// to avoid third-party CDN URL drift (Google Fonts subset hashes change).
+// In the browser, @react-pdf/renderer fetches `src` via fetch() so a
+// relative path resolves against window.location.
+function fontUrl(file: string): string {
+  if (typeof window !== "undefined") {
+    return new URL(file, window.location.origin).toString();
+  }
+  return file;
+}
+
 Font.register({
   family: "Noto Sans JP",
   fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFowwI.woff2",
-      fontWeight: 400,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/notosansjp/v53/-F6pfjtqLzI2JPCgQBnw7HFQYjzBuw.woff2",
-      fontWeight: 700,
-    },
+    { src: fontUrl("/fonts/NotoSansJP-Regular.woff2"), fontWeight: 400 },
+    { src: fontUrl("/fonts/NotoSansJP-Bold.woff2"), fontWeight: 700 },
   ],
 });
 
