@@ -259,11 +259,15 @@ export function dormantCustomers(
   monthsAgo = 6,
   ref: Date = new Date(),
 ): Customer[] {
+  // Q15「取引のない顧客」は『過去に取引があったが直近{monthsAgo}ヶ月は静かな顧客』。
+  // 一度も Invoice が無い prospect は新規見込みなので休眠扱いから除外する。
   const cutoff = startOfMonth(subMonths(ref, monthsAgo));
   return customers.filter((c) => {
-    const recent = invoices
-      .filter((inv) => inv.customerId === c.id)
-      .some((inv) => isAfter(parseISO(inv.issueDate), cutoff));
+    const customerInvoices = invoices.filter((inv) => inv.customerId === c.id);
+    if (customerInvoices.length === 0) return false;
+    const recent = customerInvoices.some((inv) =>
+      isAfter(parseISO(inv.issueDate), cutoff),
+    );
     return !recent;
   });
 }

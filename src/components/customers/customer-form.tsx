@@ -1,6 +1,5 @@
 "use client";
 
-import type { Resolver } from "react-hook-form";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,15 +24,15 @@ import {
 
 const schema = z.object({
   name: z.string().min(1, "顧客名を入力してください"),
-  industry: z.string().optional().default(""),
+  industry: z.string(),
   contactPerson: z.string().min(1, "担当者を入力してください"),
-  contactRole: z.string().optional().default(""),
+  contactRole: z.string(),
   email: z.string().email("メール形式が不正です"),
-  phone: z.string().optional().default(""),
-  postalCode: z.string().optional().default(""),
-  address: z.string().optional().default(""),
-  status: z.enum(["active", "prospect", "inactive"]).default("active"),
-  notes: z.string().optional().default(""),
+  phone: z.string(),
+  postalCode: z.string(),
+  address: z.string(),
+  status: z.enum(["active", "prospect", "inactive"]),
+  notes: z.string(),
 });
 
 type FormValues = z.output<typeof schema>;
@@ -60,7 +59,7 @@ export function CustomerForm({
     control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema) as unknown as Resolver<FormValues>,
+    resolver: zodResolver(schema),
     defaultValues: customer
       ? {
           name: customer.name,

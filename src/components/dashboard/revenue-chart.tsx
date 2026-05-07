@@ -54,7 +54,7 @@ export function RevenueChart() {
               width={48}
             />
             <Tooltip
-              cursor={{ fill: "rgba(37, 99, 235, 0.06)" }}
+              cursor={{ fill: "var(--color-accent-50)" }}
               formatter={(value) => [
                 `¥${Number(value ?? 0).toLocaleString()}`,
                 "入金",
