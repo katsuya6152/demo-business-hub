@@ -161,7 +161,9 @@ export function PaymentModal({
                   }}
                 >
                   <SelectTrigger id="payment-method" className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {PAYMENT_METHOD_LABELS[field.value]}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {METHOD_OPTIONS.map((m) => (

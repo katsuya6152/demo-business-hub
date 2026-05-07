@@ -7,12 +7,12 @@ export type DealStage =
   | "lost";
 
 export const DEAL_STAGE_LABELS: Record<DealStage, string> = {
-  lead: "Lead",
-  qualified: "Qualified",
-  "proposal-sent": "Proposal",
-  negotiation: "Negotiation",
-  won: "Won",
-  lost: "Lost",
+  lead: "リード",
+  qualified: "商談化",
+  "proposal-sent": "提案中",
+  negotiation: "交渉中",
+  won: "受注",
+  lost: "失注",
 };
 
 export const DEAL_STAGE_ORDER: DealStage[] = [

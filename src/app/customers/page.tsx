@@ -97,7 +97,11 @@ export default function CustomersPage() {
               aria-label="ステータスでフィルタ"
               className="w-full sm:w-44"
             >
-              <SelectValue />
+              <SelectValue>
+                {statusFilter === "all"
+                  ? "全てのステータス"
+                  : CUSTOMER_STATUS_LABELS[statusFilter]}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全てのステータス</SelectItem>
@@ -146,12 +150,12 @@ export default function CustomersPage() {
         )}
       </div>
 
-      {/* Mobile FAB */}
+      {/* Mobile FAB — bottom-nav (h-14) と被らないよう余白を取る */}
       <button
         type="button"
         aria-label="新規顧客を追加"
         onClick={() => setSheetOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent-600)] text-white shadow-lg transition-transform hover:scale-105 active:translate-y-px sm:hidden"
+        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent-600)] text-white shadow-lg transition-transform hover:scale-105 active:translate-y-px sm:hidden"
       >
         <Plus className="h-6 w-6" />
       </button>

@@ -224,7 +224,10 @@ export function InvoiceEditor({ invoice, initialValues }: InvoiceEditorProps) {
                   }}
                 >
                   <SelectTrigger id="invoice-customer" className="w-full">
-                    <SelectValue placeholder="顧客を選択" />
+                    <SelectValue placeholder="顧客を選択">
+                      {customers.find((c) => c.id === field.value)?.name ??
+                        "顧客を選択"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {customers.map((c) => (
@@ -256,7 +259,9 @@ export function InvoiceEditor({ invoice, initialValues }: InvoiceEditorProps) {
                   }}
                 >
                   <SelectTrigger id="invoice-status" className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {INVOICE_STATUS_LABELS[field.value]}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((s) => (

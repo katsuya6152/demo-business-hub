@@ -41,15 +41,17 @@ export function IndustrySwitcher() {
     <>
       <Select value={industry} onValueChange={handleChange}>
         <SelectTrigger
-          className="w-12 bg-card sm:w-44 md:w-48"
+          className="h-9 w-auto min-w-[3.25rem] gap-1 bg-card px-2 sm:w-44 sm:min-w-0 sm:px-3 md:w-48"
           aria-label="業種を切り替える"
         >
           <SelectValue>
-            <span className="text-base sm:mr-2">
-              {INDUSTRY_EMOJIS[industry]}
-            </span>
-            <span className="hidden sm:inline">
-              {INDUSTRY_LABELS[industry]}
+            <span className="inline-flex items-center gap-2">
+              <span className="text-base leading-none">
+                {INDUSTRY_EMOJIS[industry]}
+              </span>
+              <span className="hidden sm:inline">
+                {INDUSTRY_LABELS[industry]}
+              </span>
             </span>
           </SelectValue>
         </SelectTrigger>

@@ -87,7 +87,7 @@ export function NavList({ onNavigate, variant = "desktop" }: NavListProps) {
 
 export function Sidebar() {
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-[var(--color-line)] bg-[var(--color-bg-soft)] md:flex md:flex-col">
+    <aside className="hidden w-56 shrink-0 border-r border-[var(--color-line)] bg-[var(--color-bg-soft)] lg:flex lg:flex-col">
       <div className="px-5 py-4 border-b border-[var(--color-line)]">
         <p className="text-xs uppercase tracking-wider text-[var(--color-ink-500)]">
           Business Hub

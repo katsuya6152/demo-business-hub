@@ -33,7 +33,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="主要画面タブ"
-      className="fixed inset-x-0 bottom-0 z-30 flex h-14 items-stretch border-t border-[var(--color-line)] bg-card/95 backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 flex h-14 items-stretch border-t border-[var(--color-line)] bg-card/95 backdrop-blur lg:hidden"
     >
       {TAB_ITEMS.map((item) => {
         const Icon = item.icon;

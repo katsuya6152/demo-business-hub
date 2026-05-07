@@ -124,7 +124,11 @@ export default function QuotesPage() {
             }
           >
             <SelectTrigger className="w-full bg-card md:w-48">
-              <SelectValue />
+              <SelectValue>
+                {statusFilter === "all"
+                  ? "すべての状態"
+                  : QUOTE_STATUS_LABELS[statusFilter]}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">すべての状態</SelectItem>

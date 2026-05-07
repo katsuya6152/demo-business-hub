@@ -132,7 +132,9 @@ export function CustomerForm({
                 }}
               >
                 <SelectTrigger id="customer-status" className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {CUSTOMER_STATUS_LABELS[field.value]}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {STATUS_OPTIONS.map((s) => (

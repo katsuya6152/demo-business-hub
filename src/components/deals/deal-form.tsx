@@ -130,7 +130,10 @@ export function DealForm({
               onValueChange={(v) => field.onChange(v)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="顧客を選択" />
+                <SelectValue placeholder="顧客を選択">
+                  {customers.find((c) => c.id === field.value)?.name ??
+                    "顧客を選択"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {customers.length === 0 ? (
@@ -164,7 +167,9 @@ export function DealForm({
               onValueChange={(v) => field.onChange(v)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue>
+                  {DEAL_STAGE_LABELS[field.value]}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {DEAL_STAGE_ORDER.map((s) => (

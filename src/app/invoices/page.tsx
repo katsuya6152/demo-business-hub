@@ -106,7 +106,11 @@ export default function InvoicesPage() {
             }}
           >
             <SelectTrigger className="w-full md:w-44">
-              <SelectValue />
+              <SelectValue>
+                {statusFilter === "all"
+                  ? "全てのステータス"
+                  : INVOICE_STATUS_LABELS[statusFilter]}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全てのステータス</SelectItem>

@@ -23,7 +23,7 @@ export function MobileNavTrigger() {
             variant="ghost"
             size="icon"
             aria-label="メニューを開く"
-            className="md:hidden"
+            className="lg:hidden"
           />
         }
       >

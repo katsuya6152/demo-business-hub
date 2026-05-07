@@ -232,7 +232,10 @@ export function QuoteEditor({ quote, defaultDealId }: QuoteEditorProps) {
                     className="w-full"
                     aria-invalid={errors.customerId ? true : undefined}
                   >
-                    <SelectValue placeholder="顧客を選択" />
+                    <SelectValue placeholder="顧客を選択">
+                      {customers.find((c) => c.id === field.value)?.name ??
+                        "顧客を選択"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {customers.length === 0 ? (
@@ -405,7 +408,9 @@ export function QuoteEditor({ quote, defaultDealId }: QuoteEditorProps) {
                   onValueChange={(v) => v && field.onChange(v)}
                 >
                   <SelectTrigger id="quote-status" className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {QUOTE_STATUS_LABELS[field.value]}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {QUOTE_STATUSES.map((s) => (
