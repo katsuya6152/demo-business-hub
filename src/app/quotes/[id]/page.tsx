@@ -1,17 +1,12 @@
 "use client";
 
-import { use } from "react";
+import { use, useMemo } from "react";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  MoreVertical,
-  Printer,
-  Receipt,
-  Save,
-} from "lucide-react";
+import { MoreVertical, Printer, Receipt, Save } from "lucide-react";
 
 import { AppShell } from "@/components/layout/app-shell";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/shared/empty-state";
+import {
+  DetailBackLink,
+  DetailHeader,
+} from "@/components/shared/detail-layout";
+import { QuoteStatusBadge } from "@/components/shared/status-badge";
 import { useMounted } from "@/hooks/use-mounted";
 import { useQuotesStore } from "@/lib/store/quotes";
 import { useCustomersStore } from "@/lib/store/customers";
@@ -36,11 +36,17 @@ export default function QuoteDetailPage({
 }) {
   const { id } = use(params);
   const mounted = useMounted();
-  const quote = useQuotesStore((s) => s.quotes.find((q) => q.id === id));
-  const customer = useCustomersStore((s) =>
-    quote ? s.customers.find((c) => c.id === quote.customerId) : undefined,
-  );
+
+  const quotes = useQuotesStore((s) => s.quotes);
+  const customers = useCustomersStore((s) => s.customers);
   const company = useSettingsStore((s) => s.settings.company);
+
+  const quote = useMemo(() => quotes.find((q) => q.id === id), [quotes, id]);
+  const customer = useMemo(
+    () =>
+      quote ? customers.find((c) => c.id === quote.customerId) : undefined,
+    [customers, quote],
+  );
 
   const handlePrint = () => {
     window.print();
@@ -49,7 +55,10 @@ export default function QuoteDetailPage({
   if (!mounted) {
     return (
       <AppShell>
-        <p className="text-sm text-[var(--color-ink-500)]">読み込み中...</p>
+        <div className="space-y-4">
+          <DetailBackLink href="/quotes" label="見積一覧へ" />
+          <p className="text-sm text-[var(--color-ink-500)]">読み込み中...</p>
+        </div>
       </AppShell>
     );
   }
@@ -57,23 +66,18 @@ export default function QuoteDetailPage({
   if (!quote) {
     return (
       <AppShell>
-        <div className="space-y-6">
-          <Button
-            nativeButton={false}
-            variant="outline"
-            size="sm"
-            render={<Link href="/quotes" />}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            一覧へ
-          </Button>
+        <div className="space-y-4">
+          <DetailBackLink href="/quotes" label="見積一覧へ" />
           <EmptyState
             title="見積が見つかりません"
             description="削除されたか、URL が誤っている可能性があります。"
             action={
-              <Button nativeButton={false} render={<Link href="/quotes" />}>
+              <Link
+                href="/quotes"
+                className={cn(buttonVariants({ variant: "outline" }))}
+              >
                 一覧に戻る
-              </Button>
+              </Link>
             }
           />
         </div>
@@ -85,40 +89,27 @@ export default function QuoteDetailPage({
     <>
       <AppShell>
         <div className="space-y-6 screen-only">
-          <div className="sticky top-0 z-10 -mx-4 -mt-6 border-b border-[var(--color-line)] bg-background/90 px-4 py-3 backdrop-blur md:-mx-8 md:-mt-8 md:px-8">
+          <div className="sticky top-14 z-10 -mx-4 border-b border-[var(--color-line)] bg-background/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <Button
-                  nativeButton={false}
-                  variant="outline"
-                  size="sm"
-                  render={<Link href="/quotes" />}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="hidden sm:inline">一覧へ</span>
-                </Button>
-                <div className="min-w-0">
-                  <h1 className="truncate text-xl font-bold text-[var(--color-ink-950)] md:text-2xl">
-                    {quote.title || "（無題）"}
-                  </h1>
-                  <p className="mt-0.5 truncate font-mono text-xs text-[var(--color-ink-500)]">
-                    {quote.number}
-                  </p>
-                </div>
-              </div>
-
-              {/* Desktop: full action set */}
-              <div className="hidden items-center gap-2 md:flex">
-                <Button
-                  nativeButton={false}
-                  variant="outline"
-                  size="sm"
-                  render={<Link href={`/invoices/new?quoteId=${quote.id}`} />}
+              <DetailBackLink href="/quotes" label="見積一覧へ" />
+              <div className="flex items-center gap-2">
+                {/* Desktop: full actions */}
+                <Link
+                  href={`/invoices/new?quoteId=${quote.id}`}
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "hidden md:inline-flex",
+                  )}
                 >
                   <Receipt className="h-4 w-4" />
                   請求書を作成
-                </Button>
-                <Button variant="outline" size="sm" onClick={handlePrint}>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrint}
+                  className="hidden md:inline-flex"
+                >
                   <Printer className="h-4 w-4" />
                   印刷
                 </Button>
@@ -126,22 +117,15 @@ export default function QuoteDetailPage({
                   <Save className="h-4 w-4" />
                   保存
                 </Button>
-              </div>
-
-              {/* Mobile: save + overflow menu */}
-              <div className="flex items-center gap-2 md:hidden">
-                <Button type="submit" form="quote-form" size="sm">
-                  <Save className="h-4 w-4" />
-                  保存
-                </Button>
+                {/* Mobile: overflow menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     render={
                       <Button
-                        nativeButton={false}
                         variant="outline"
                         size="icon-sm"
                         aria-label="その他の操作"
+                        className="md:hidden"
                       >
                         <MoreVertical className="h-4 w-4" />
                       </Button>
@@ -165,6 +149,24 @@ export default function QuoteDetailPage({
               </div>
             </div>
           </div>
+
+          <DetailHeader
+            eyebrow={quote.number}
+            title={quote.title || "（無題）"}
+            subtitle={
+              customer ? (
+                <Link
+                  href={`/customers/${customer.id}`}
+                  className="hover:underline"
+                >
+                  {customer.name}
+                </Link>
+              ) : (
+                "顧客未設定"
+              )
+            }
+            badges={<QuoteStatusBadge status={quote.status} />}
+          />
 
           <QuoteEditor quote={quote} />
         </div>

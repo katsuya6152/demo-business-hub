@@ -4,7 +4,6 @@ import { use, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
   Pencil,
   Printer,
   Receipt,
@@ -14,17 +13,26 @@ import {
 import { toast } from "sonner";
 import { parseISO, isBefore } from "date-fns";
 import { AppShell } from "@/components/layout/app-shell";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { InvoiceStatusBadge } from "@/components/shared/status-badge";
+import {
+  DetailBackLink,
+  DetailHeader,
+  DetailSection,
+  DetailField,
+  DetailFieldGrid,
+  DetailMetaList,
+} from "@/components/shared/detail-layout";
 import { InvoiceEditor } from "@/components/invoices/invoice-editor";
 import { InvoicePrint } from "@/components/invoices/invoice-print";
 import { PaymentModal } from "@/components/invoices/payment-modal";
 import { useInvoicesStore } from "@/lib/store/invoices";
 import { useCustomersStore } from "@/lib/store/customers";
 import { usePaymentsStore } from "@/lib/store/payments";
-import { fmtDate } from "@/lib/utils/date";
+import { fmtDate, fmtDateTime } from "@/lib/utils/date";
 import { formatYen } from "@/lib/utils/currency";
 import { PAYMENT_METHOD_LABELS } from "@/lib/types/payment";
 import type { InvoiceStatus } from "@/lib/types/invoice";
@@ -37,11 +45,8 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const { id } = use(params);
   const router = useRouter();
 
-  const invoice = useInvoicesStore((s) =>
-    s.invoices.find((inv) => inv.id === id),
-  );
+  const invoices = useInvoicesStore((s) => s.invoices);
   const removeInvoice = useInvoicesStore((s) => s.remove);
-
   const customers = useCustomersStore((s) => s.customers);
   const payments = usePaymentsStore((s) => s.payments);
 
@@ -50,6 +55,17 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const today = useMemo(() => new Date(), []);
+  const invoice = useMemo(
+    () => invoices.find((inv) => inv.id === id),
+    [invoices, id],
+  );
+  const customer = useMemo(
+    () =>
+      invoice
+        ? customers.find((c) => c.id === invoice.customerId)
+        : undefined,
+    [customers, invoice],
+  );
 
   const invoicePayments = useMemo(
     () =>
@@ -67,22 +83,26 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   if (!invoice) {
     return (
       <AppShell>
-        <EmptyState
-          icon={<Receipt className="h-8 w-8" />}
-          title="請求が見つかりません"
-          description="削除されたか、URL が変更されている可能性があります。"
-          action={
-            <Button onClick={() => router.push("/invoices")}>
-              <ArrowLeft className="h-4 w-4" />
-              請求一覧へ戻る
-            </Button>
-          }
-        />
+        <div className="space-y-4">
+          <DetailBackLink href="/invoices" label="請求一覧へ" />
+          <EmptyState
+            icon={<Receipt className="h-7 w-7" />}
+            title="請求が見つかりません"
+            description="削除されたか、URL が変更されている可能性があります。"
+            action={
+              <Link
+                href="/invoices"
+                className={cn(buttonVariants({ variant: "outline" }))}
+              >
+                請求一覧へ戻る
+              </Link>
+            }
+          />
+        </div>
       </AppShell>
     );
   }
 
-  const customer = customers.find((c) => c.id === invoice.customerId);
   const effectiveStatus: InvoiceStatus =
     invoice.status === "sent" && isBefore(parseISO(invoice.dueDate), today)
       ? "overdue"
@@ -105,208 +125,227 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
       <div className="screen-only">
         <AppShell>
           <div className="space-y-6">
-            <Link
-              href="/invoices"
-              className="inline-flex w-fit items-center gap-1 text-xs text-[var(--color-ink-500)] hover:text-[var(--color-ink-950)]"
-            >
-              <ArrowLeft className="h-3 w-3" />
-              請求一覧
-            </Link>
+            <DetailBackLink href="/invoices" label="請求一覧へ" />
 
-            <header className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold text-[var(--color-ink-950)]">
-                  {invoice.number}
-                </h1>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-ink-500)]">
-                  <InvoiceStatusBadge status={effectiveStatus} />
-                  <span>{customer?.name ?? "—"}</span>
-                  <span>発行 {fmtDate(invoice.issueDate)}</span>
-                  <span>期限 {fmtDate(invoice.dueDate)}</span>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                {!editing ? (
+            <DetailHeader
+              eyebrow={invoice.number}
+              title={invoice.title || "（無題）"}
+              subtitle={
+                customer ? (
+                  <Link
+                    href={`/customers/${customer.id}`}
+                    className="hover:underline"
+                  >
+                    {customer.name}
+                  </Link>
+                ) : (
+                  "顧客未設定"
+                )
+              }
+              badges={<InvoiceStatusBadge status={effectiveStatus} />}
+              actions={
+                !editing ? (
                   <>
-                    <Button variant="outline" onClick={handlePrint}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePrint}
+                    >
                       <Printer className="h-4 w-4" />
-                      印刷
+                      <span className="hidden sm:inline">印刷</span>
                     </Button>
                     <Button
                       variant="outline"
+                      size="sm"
+                      onClick={() => setPayOpen(true)}
+                      disabled={invoice.status === "paid"}
+                    >
+                      <Wallet className="h-4 w-4" />
+                      <span className="hidden sm:inline">入金記録</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditing(true)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      <span className="hidden sm:inline">編集</span>
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteOpen(true)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">削除</span>
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditing(false)}
+                  >
+                    編集を終了
+                  </Button>
+                )
+              }
+            />
+
+            {editing ? (
+              <InvoiceEditor invoice={invoice} />
+            ) : (
+              <>
+                <div className="grid gap-4 lg:grid-cols-3">
+                  <DetailSection title="基本情報" className="lg:col-span-2">
+                    <DetailFieldGrid>
+                      <DetailField label="件名">{invoice.title}</DetailField>
+                      <DetailField label="顧客">
+                        {customer?.name ?? "—"}
+                      </DetailField>
+                      <DetailField label="発行日">
+                        {fmtDate(invoice.issueDate)}
+                      </DetailField>
+                      <DetailField label="支払期日">
+                        <span
+                          className={cn(
+                            effectiveStatus === "overdue"
+                              ? "font-semibold text-red-600"
+                              : "",
+                          )}
+                        >
+                          {fmtDate(invoice.dueDate)}
+                        </span>
+                      </DetailField>
+                      {invoice.quoteId ? (
+                        <DetailField label="関連見積">
+                          <span className="font-mono text-xs">
+                            {invoice.quoteId}
+                          </span>
+                        </DetailField>
+                      ) : null}
+                      {invoice.paidAt ? (
+                        <DetailField label="入金日">
+                          {fmtDate(invoice.paidAt)}
+                        </DetailField>
+                      ) : null}
+                    </DetailFieldGrid>
+                    {invoice.notes ? (
+                      <div className="mt-6 border-t border-[var(--color-line)] pt-4">
+                        <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-500)]">
+                          備考
+                        </p>
+                        <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-ink-700)]">
+                          {invoice.notes}
+                        </p>
+                      </div>
+                    ) : null}
+                  </DetailSection>
+
+                  <div className="space-y-4">
+                    <DetailSection title="サマリー">
+                      <DetailMetaList
+                        items={[
+                          {
+                            label: "小計",
+                            value: (
+                              <span className="font-mono tabular-nums">
+                                {formatYen(invoice.subtotal)}
+                              </span>
+                            ),
+                          },
+                          {
+                            label: "消費税",
+                            value: (
+                              <span className="font-mono tabular-nums">
+                                {formatYen(invoice.tax)}
+                              </span>
+                            ),
+                          },
+                          {
+                            label: "合計",
+                            value: (
+                              <span className="font-mono text-base font-bold tabular-nums text-[var(--color-accent-700)]">
+                                {formatYen(invoice.total)}
+                              </span>
+                            ),
+                          },
+                        ]}
+                      />
+                    </DetailSection>
+
+                    <DetailSection title="メタ情報">
+                      <DetailMetaList
+                        items={[
+                          {
+                            label: "作成日時",
+                            value: fmtDateTime(invoice.createdAt),
+                          },
+                          {
+                            label: "最終更新",
+                            value: fmtDateTime(invoice.updatedAt),
+                          },
+                        ]}
+                      />
+                    </DetailSection>
+                  </div>
+                </div>
+
+                <DetailSection title="明細" bodyClassName="space-y-4">
+                  <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
+                    <table className="w-full min-w-[600px] text-sm">
+                      <thead>
+                        <tr className="border-b border-[var(--color-line)] text-left text-[11px] uppercase tracking-wider text-[var(--color-ink-500)]">
+                          <th className="p-2 font-medium">品目</th>
+                          <th className="p-2 text-right font-medium">数量</th>
+                          <th className="p-2 font-medium">単位</th>
+                          <th className="p-2 text-right font-medium">単価</th>
+                          <th className="p-2 text-right font-medium">金額</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {invoice.items.map((item) => (
+                          <tr
+                            key={item.id}
+                            className="border-b border-[var(--color-line)] last:border-b-0"
+                          >
+                            <td className="p-2 text-[var(--color-ink-950)]">
+                              {item.description}
+                            </td>
+                            <td className="p-2 text-right tabular-nums">
+                              {item.quantity}
+                            </td>
+                            <td className="p-2 text-[var(--color-ink-700)]">
+                              {item.unit}
+                            </td>
+                            <td className="p-2 text-right tabular-nums">
+                              {formatYen(item.unitPrice)}
+                            </td>
+                            <td className="p-2 text-right font-medium tabular-nums text-[var(--color-ink-950)]">
+                              {formatYen(item.quantity * item.unitPrice)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </DetailSection>
+
+                <DetailSection
+                  title="入金履歴"
+                  description={`${invoicePayments.length} 件`}
+                  actions={
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setPayOpen(true)}
                       disabled={invoice.status === "paid"}
                     >
                       <Wallet className="h-4 w-4" />
                       入金記録
                     </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setEditing(true)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                      編集
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => setDeleteOpen(true)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      削除
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditing(false)}
-                  >
-                    編集を終了
-                  </Button>
-                )}
-              </div>
-            </header>
-
-            {editing ? (
-              <InvoiceEditor invoice={invoice} />
-            ) : (
-              <>
-                <section className="rounded-lg border border-[var(--color-line)] bg-card p-5">
-                  <h2 className="mb-3 text-sm font-semibold text-[var(--color-ink-950)]">
-                    基本情報
-                  </h2>
-                  <dl className="grid gap-x-6 gap-y-3 text-sm md:grid-cols-2">
-                    <div>
-                      <dt className="text-xs text-[var(--color-ink-500)]">
-                        件名
-                      </dt>
-                      <dd className="mt-0.5 text-[var(--color-ink-950)]">
-                        {invoice.title}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-[var(--color-ink-500)]">
-                        顧客
-                      </dt>
-                      <dd className="mt-0.5 text-[var(--color-ink-950)]">
-                        {customer?.name ?? "—"}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-[var(--color-ink-500)]">
-                        発行日
-                      </dt>
-                      <dd className="mt-0.5 text-[var(--color-ink-950)]">
-                        {fmtDate(invoice.issueDate)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-[var(--color-ink-500)]">
-                        支払期日
-                      </dt>
-                      <dd className="mt-0.5 text-[var(--color-ink-950)]">
-                        {fmtDate(invoice.dueDate)}
-                      </dd>
-                    </div>
-                    {invoice.quoteId ? (
-                      <div>
-                        <dt className="text-xs text-[var(--color-ink-500)]">
-                          関連見積
-                        </dt>
-                        <dd className="mt-0.5 text-[var(--color-ink-950)]">
-                          {invoice.quoteId}
-                        </dd>
-                      </div>
-                    ) : null}
-                    {invoice.paidAt ? (
-                      <div>
-                        <dt className="text-xs text-[var(--color-ink-500)]">
-                          入金日
-                        </dt>
-                        <dd className="mt-0.5 text-[var(--color-ink-950)]">
-                          {fmtDate(invoice.paidAt)}
-                        </dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                </section>
-
-                <section className="rounded-lg border border-[var(--color-line)] bg-card p-5">
-                  <h2 className="mb-3 text-sm font-semibold text-[var(--color-ink-950)]">
-                    明細
-                  </h2>
-                  <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
-                  <table className="w-full min-w-[600px] text-sm">
-                    <thead>
-                      <tr className="border-b border-[var(--color-line)] text-left text-xs text-[var(--color-ink-500)]">
-                        <th className="p-2 font-medium">品目</th>
-                        <th className="p-2 text-right font-medium">数量</th>
-                        <th className="p-2 font-medium">単位</th>
-                        <th className="p-2 text-right font-medium">単価</th>
-                        <th className="p-2 text-right font-medium">金額</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {invoice.items.map((item) => (
-                        <tr
-                          key={item.id}
-                          className="border-b border-[var(--color-line)] last:border-b-0"
-                        >
-                          <td className="p-2">{item.description}</td>
-                          <td className="p-2 text-right tabular-nums">
-                            {item.quantity}
-                          </td>
-                          <td className="p-2">{item.unit}</td>
-                          <td className="p-2 text-right tabular-nums">
-                            {formatYen(item.unitPrice)}
-                          </td>
-                          <td className="p-2 text-right tabular-nums">
-                            {formatYen(item.quantity * item.unitPrice)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  </div>
-
-                  <div className="mt-4 flex justify-end">
-                    <dl className="w-full max-w-xs space-y-2 text-sm">
-                      <div className="flex items-center justify-between">
-                        <dt className="text-[var(--color-ink-500)]">小計</dt>
-                        <dd className="tabular-nums text-[var(--color-ink-950)]">
-                          {formatYen(invoice.subtotal)}
-                        </dd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <dt className="text-[var(--color-ink-500)]">消費税</dt>
-                        <dd className="tabular-nums text-[var(--color-ink-950)]">
-                          {formatYen(invoice.tax)}
-                        </dd>
-                      </div>
-                      <div className="flex items-center justify-between border-t border-[var(--color-line)] pt-2 text-base font-bold">
-                        <dt>合計</dt>
-                        <dd className="tabular-nums text-[var(--color-ink-950)]">
-                          {formatYen(invoice.total)}
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-                </section>
-
-                {invoice.notes ? (
-                  <section className="rounded-lg border border-[var(--color-line)] bg-card p-5">
-                    <h2 className="mb-2 text-sm font-semibold text-[var(--color-ink-950)]">
-                      備考
-                    </h2>
-                    <p className="whitespace-pre-wrap text-sm text-[var(--color-ink-700)]">
-                      {invoice.notes}
-                    </p>
-                  </section>
-                ) : null}
-
-                <section className="rounded-lg border border-[var(--color-line)] bg-card p-5">
-                  <h2 className="mb-3 text-sm font-semibold text-[var(--color-ink-950)]">
-                    入金履歴（{invoicePayments.length} 件）
-                  </h2>
+                  }
+                >
                   {invoicePayments.length === 0 ? (
                     <p className="text-sm text-[var(--color-ink-500)]">
                       まだ入金は記録されていません。
@@ -316,13 +355,13 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                       {invoicePayments.map((p) => (
                         <li
                           key={p.id}
-                          className="flex flex-col gap-1 py-2 md:flex-row md:items-center md:justify-between"
+                          className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
                         >
                           <div className="flex items-center gap-3 text-sm">
                             <span className="font-medium text-[var(--color-ink-950)]">
                               {fmtDate(p.paidAt)}
                             </span>
-                            <span className="text-xs text-[var(--color-ink-500)]">
+                            <span className="rounded-full bg-[var(--color-bg-elevated)] px-2 py-0.5 text-[11px] text-[var(--color-ink-700)]">
                               {PAYMENT_METHOD_LABELS[p.method]}
                             </span>
                             {p.notes ? (
@@ -331,14 +370,14 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                               </span>
                             ) : null}
                           </div>
-                          <span className="font-semibold tabular-nums text-[var(--color-ink-950)]">
+                          <span className="font-mono text-base font-semibold tabular-nums text-[var(--color-cyan-700)]">
                             {formatYen(p.amount)}
                           </span>
                         </li>
                       ))}
                     </ul>
                   )}
-                </section>
+                </DetailSection>
               </>
             )}
           </div>
