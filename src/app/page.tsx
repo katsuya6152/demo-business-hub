@@ -4,7 +4,7 @@ import { useSettingsStore } from "@/lib/store/settings";
 import { useMounted } from "@/hooks/use-mounted";
 import { Onboarding } from "@/components/onboarding/onboarding";
 import { AppShell } from "@/components/layout/app-shell";
-import { DashboardPlaceholder } from "@/components/dashboard/placeholder";
+import { DashboardContent } from "@/components/dashboard/dashboard-content";
 
 export default function Home() {
   const initialized = useSettingsStore((s) => s.initialized);
@@ -24,7 +24,7 @@ export default function Home() {
 
   return (
     <AppShell>
-      <DashboardPlaceholder />
+      <DashboardContent />
     </AppShell>
   );
 }
