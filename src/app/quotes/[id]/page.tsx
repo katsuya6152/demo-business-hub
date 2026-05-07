@@ -48,7 +48,7 @@ export default function QuoteDetailPage({
     return (
       <AppShell>
         <div className="space-y-6">
-          <Button variant="outline" size="sm" render={<Link href="/quotes" />}>
+          <Button nativeButton={false} variant="outline" size="sm" render={<Link href="/quotes" />}>
             <ArrowLeft className="h-4 w-4" />
             一覧へ
           </Button>
@@ -71,6 +71,7 @@ export default function QuoteDetailPage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <Button
+                nativeButton={false}
                 variant="outline"
                 size="sm"
                 render={<Link href="/quotes" />}
@@ -89,6 +90,7 @@ export default function QuoteDetailPage({
             </div>
             <div className="flex items-center gap-2">
               <Button
+                nativeButton={false}
                 variant="outline"
                 size="sm"
                 render={

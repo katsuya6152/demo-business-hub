@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -9,7 +9,7 @@ import { InvoiceEditor } from "@/components/invoices/invoice-editor";
 import { useQuotesStore } from "@/lib/store/quotes";
 import { newId } from "@/lib/utils/id";
 
-export default function NewInvoicePage() {
+function NewInvoiceContent() {
   const searchParams = useSearchParams();
   const quoteId = searchParams.get("quoteId") ?? undefined;
   const dealId = searchParams.get("dealId") ?? undefined;
@@ -61,5 +61,19 @@ export default function NewInvoicePage() {
         <InvoiceEditor initialValues={initialValues} />
       </div>
     </AppShell>
+  );
+}
+
+export default function NewInvoicePage() {
+  return (
+    <Suspense
+      fallback={
+        <AppShell>
+          <p className="text-sm text-[var(--color-ink-500)]">読み込み中...</p>
+        </AppShell>
+      }
+    >
+      <NewInvoiceContent />
+    </Suspense>
   );
 }

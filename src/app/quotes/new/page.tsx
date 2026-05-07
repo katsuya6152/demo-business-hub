@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useMounted } from "@/hooks/use-mounted";
 import { QuoteEditor } from "@/components/quotes/quote-editor";
 
-export default function NewQuotePage() {
+function NewQuoteContent() {
   const mounted = useMounted();
   const searchParams = useSearchParams();
   const dealId = searchParams.get("dealId") ?? undefined;
@@ -19,6 +20,7 @@ export default function NewQuotePage() {
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <Button
+            nativeButton={false}
             variant="outline"
             size="sm"
             render={<Link href="/quotes" />}
@@ -43,5 +45,19 @@ export default function NewQuotePage() {
         )}
       </div>
     </AppShell>
+  );
+}
+
+export default function NewQuotePage() {
+  return (
+    <Suspense
+      fallback={
+        <AppShell>
+          <p className="text-sm text-[var(--color-ink-500)]">読み込み中...</p>
+        </AppShell>
+      }
+    >
+      <NewQuoteContent />
+    </Suspense>
   );
 }
