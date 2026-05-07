@@ -31,7 +31,7 @@ export function RevenueChart() {
   return (
     <Card className="p-5">
       <div className="mb-3">
-        <h3 className="text-sm font-semibold text-[var(--color-ink-950)]">
+        <h3 className="text-base font-semibold text-[var(--color-ink-950)]">
           売上推移（直近6ヶ月）
         </h3>
         <p className="text-xs text-[var(--color-ink-500)]">
@@ -69,7 +69,8 @@ export function RevenueChart() {
             <Bar
               dataKey="amount"
               fill="var(--color-accent-600)"
-              radius={[4, 4, 0, 0]}
+              radius={[6, 6, 0, 0]}
+              animationDuration={800}
             />
           </BarChart>
         </ResponsiveContainer>

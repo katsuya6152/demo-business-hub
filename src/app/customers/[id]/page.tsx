@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import {
@@ -108,10 +109,11 @@ export default function CustomerDetailPage({
   };
 
   const recentDeals = customerDeals.slice(0, 3);
+  const dealsTotal = customerDeals.reduce((s, d) => s + d.amount, 0);
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col gap-3">
           <Link
             href="/customers"
@@ -132,14 +134,19 @@ export default function CustomerDetailPage({
                 <span>更新 {fmtRelative(customer.updatedAt)}</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => setEditOpen(true)}>
+            <div className="flex w-full items-center gap-2 md:w-auto">
+              <Button
+                variant="outline"
+                onClick={() => setEditOpen(true)}
+                className="flex-1 md:flex-none"
+              >
                 <Pencil className="h-4 w-4" />
                 編集
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => setConfirmOpen(true)}
+                className="flex-1 md:flex-none"
               >
                 <Trash2 className="h-4 w-4" />
                 削除
@@ -150,7 +157,7 @@ export default function CustomerDetailPage({
 
         <div className="grid gap-4 lg:grid-cols-3">
           <Section title="基本情報" className="lg:col-span-2">
-            <dl className="grid gap-x-6 gap-y-3 text-sm md:grid-cols-2">
+            <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
               <Field label="業種" value={customer.industry || "—"} />
               <Field
                 label="ステータス"
@@ -161,8 +168,8 @@ export default function CustomerDetailPage({
               <Field
                 label="Email"
                 value={
-                  <span className="inline-flex items-center gap-1.5">
-                    <Mail className="h-3.5 w-3.5 text-[var(--color-ink-500)]" />
+                  <span className="inline-flex items-center gap-1.5 break-all">
+                    <Mail className="h-3.5 w-3.5 shrink-0 text-[var(--color-ink-500)]" />
                     {customer.email}
                   </span>
                 }
@@ -189,8 +196,8 @@ export default function CustomerDetailPage({
                 value={
                   customer.address ? (
                     <span className="inline-flex items-start gap-1.5">
-                      <MapPin className="mt-0.5 h-3.5 w-3.5 text-[var(--color-ink-500)]" />
-                      {customer.address}
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--color-ink-500)]" />
+                      <span className="break-all">{customer.address}</span>
                     </span>
                   ) : (
                     "—"
@@ -235,112 +242,110 @@ export default function CustomerDetailPage({
           )}
         </Section>
 
-        <Section
-          title="関連案件"
-          subtitle={`${customerDeals.length} 件 ・ 合計 ${formatYen(
-            customerDeals.reduce((s, d) => s + d.amount, 0),
-          )}`}
-        >
-          {recentDeals.length === 0 ? (
-            <p className="text-sm text-[var(--color-ink-500)]">
-              関連する案件はありません。
-            </p>
-          ) : (
-            <ul className="divide-y divide-[var(--color-line)]">
-              {recentDeals.map((deal) => (
-                <li
-                  key={deal.id}
-                  className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0 md:flex-row md:items-center md:justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <DealStageBadge stage={deal.stage} />
-                    <span className="text-sm font-medium text-[var(--color-ink-950)]">
-                      {deal.title}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 text-xs text-[var(--color-ink-500)]">
-                    <span>確度 {deal.probability}%</span>
-                    <span>クローズ予定 {fmtDate(deal.expectedCloseDate)}</span>
-                    <span className="font-medium text-[var(--color-ink-950)] tabular-nums">
-                      {formatYen(deal.amount)}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Section>
+        <Section title="関連">
+          <Tabs defaultValue="deals" className="w-full">
+            <TabsList className="w-full overflow-x-auto sm:w-fit">
+              <TabsTrigger value="deals">
+                関連案件 ({customerDeals.length})
+              </TabsTrigger>
+              <TabsTrigger value="quotes">
+                見積 ({customerQuotes.length})
+              </TabsTrigger>
+              <TabsTrigger value="invoices">
+                請求 ({customerInvoices.length})
+              </TabsTrigger>
+            </TabsList>
 
-        <Section
-          title="取引履歴"
-          subtitle={`見積 ${customerQuotes.length} 件 / 請求 ${customerInvoices.length} 件`}
-        >
-          {customerQuotes.length === 0 && customerInvoices.length === 0 ? (
-            <p className="text-sm text-[var(--color-ink-500)]">
-              まだ取引はありません。
-            </p>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <p className="mb-2 text-xs font-semibold text-[var(--color-ink-500)]">
-                  見積（{customerQuotes.length} 件）
-                </p>
-                {customerQuotes.length === 0 ? (
-                  <p className="text-xs text-[var(--color-ink-500)]">
-                    見積はありません。
-                  </p>
-                ) : (
-                  <ul className="divide-y divide-[var(--color-line)]">
-                    {customerQuotes.map((q) => (
-                      <li
-                        key={q.id}
-                        className="flex items-center justify-between py-2 text-sm"
-                      >
-                        <div className="flex items-center gap-2">
-                          <QuoteStatusBadge status={q.status} />
-                          <span className="font-medium text-[var(--color-ink-950)]">
-                            {q.number}
-                          </span>
-                        </div>
-                        <span className="tabular-nums text-[var(--color-ink-700)]">
-                          {formatYen(q.total)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+            <TabsContent value="deals" className="mt-3">
+              <div className="mb-3 text-xs text-[var(--color-ink-500)]">
+                {customerDeals.length} 件 ・ 合計 {formatYen(dealsTotal)}
               </div>
-              <div>
-                <p className="mb-2 text-xs font-semibold text-[var(--color-ink-500)]">
-                  請求（{customerInvoices.length} 件）
+              {recentDeals.length === 0 ? (
+                <p className="text-sm text-[var(--color-ink-500)]">
+                  関連する案件はありません。
                 </p>
-                {customerInvoices.length === 0 ? (
-                  <p className="text-xs text-[var(--color-ink-500)]">
-                    請求はありません。
-                  </p>
-                ) : (
-                  <ul className="divide-y divide-[var(--color-line)]">
-                    {customerInvoices.map((inv) => (
-                      <li
-                        key={inv.id}
-                        className="flex items-center justify-between py-2 text-sm"
-                      >
-                        <div className="flex items-center gap-2">
-                          <InvoiceStatusBadge status={inv.status} />
-                          <span className="font-medium text-[var(--color-ink-950)]">
-                            {inv.number}
-                          </span>
-                        </div>
-                        <span className="tabular-nums text-[var(--color-ink-700)]">
-                          {formatYen(inv.total)}
+              ) : (
+                <ul className="divide-y divide-[var(--color-line)]">
+                  {recentDeals.map((deal) => (
+                    <li
+                      key={deal.id}
+                      className="flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <DealStageBadge stage={deal.stage} />
+                        <span className="text-sm font-medium text-[var(--color-ink-950)]">
+                          {deal.title}
                         </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--color-ink-500)]">
+                        <span>確度 {deal.probability}%</span>
+                        <span>
+                          クローズ予定 {fmtDate(deal.expectedCloseDate)}
+                        </span>
+                        <span className="font-medium text-[var(--color-ink-950)] tabular-nums">
+                          {formatYen(deal.amount)}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </TabsContent>
+
+            <TabsContent value="quotes" className="mt-3">
+              {customerQuotes.length === 0 ? (
+                <p className="text-sm text-[var(--color-ink-500)]">
+                  見積はありません。
+                </p>
+              ) : (
+                <ul className="divide-y divide-[var(--color-line)]">
+                  {customerQuotes.map((q) => (
+                    <li
+                      key={q.id}
+                      className="flex items-center justify-between gap-2 py-2 text-sm"
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <QuoteStatusBadge status={q.status} />
+                        <span className="truncate font-medium text-[var(--color-ink-950)]">
+                          {q.number}
+                        </span>
+                      </div>
+                      <span className="shrink-0 tabular-nums text-[var(--color-ink-700)]">
+                        {formatYen(q.total)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </TabsContent>
+
+            <TabsContent value="invoices" className="mt-3">
+              {customerInvoices.length === 0 ? (
+                <p className="text-sm text-[var(--color-ink-500)]">
+                  請求はありません。
+                </p>
+              ) : (
+                <ul className="divide-y divide-[var(--color-line)]">
+                  {customerInvoices.map((inv) => (
+                    <li
+                      key={inv.id}
+                      className="flex items-center justify-between gap-2 py-2 text-sm"
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <InvoiceStatusBadge status={inv.status} />
+                        <span className="truncate font-medium text-[var(--color-ink-950)]">
+                          {inv.number}
+                        </span>
+                      </div>
+                      <span className="shrink-0 tabular-nums text-[var(--color-ink-700)]">
+                        {formatYen(inv.total)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </TabsContent>
+          </Tabs>
         </Section>
       </div>
 
@@ -383,7 +388,7 @@ function Section({
   return (
     <section
       className={
-        "rounded-lg border border-[var(--color-line)] bg-card p-5" +
+        "rounded-lg border border-[var(--color-line)] bg-card p-4 sm:p-5" +
         (className ? ` ${className}` : "")
       }
     >

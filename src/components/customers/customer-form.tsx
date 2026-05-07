@@ -114,7 +114,7 @@ export function CustomerForm({
         ) : null}
       </div>
 
-      <div className="grid gap-2 md:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor="customer-industry">業種</Label>
           <Input id="customer-industry" {...register("industry")} />
@@ -147,7 +147,7 @@ export function CustomerForm({
         </div>
       </div>
 
-      <div className="grid gap-2 md:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor="customer-contact-person">
             担当者 <span className="text-destructive">*</span>
@@ -168,7 +168,7 @@ export function CustomerForm({
         </div>
       </div>
 
-      <div className="grid gap-2 md:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor="customer-email">
             Email <span className="text-destructive">*</span>
@@ -188,7 +188,7 @@ export function CustomerForm({
         </div>
       </div>
 
-      <div className="grid gap-2 md:grid-cols-[12rem_1fr]">
+      <div className="grid gap-2 sm:grid-cols-[12rem_1fr]">
         <div className="grid gap-2">
           <Label htmlFor="customer-postal">郵便番号</Label>
           <Input id="customer-postal" {...register("postalCode")} />

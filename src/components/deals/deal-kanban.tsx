@@ -56,7 +56,7 @@ function Lane({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex min-h-[200px] flex-col gap-2 rounded-xl bg-[var(--color-bg-soft)] p-3 transition-colors",
+        "flex min-h-[200px] w-[280px] shrink-0 snap-start flex-col gap-2 rounded-xl bg-[var(--color-bg-soft)] p-3 transition-colors lg:w-auto lg:shrink",
         isOver && "ring-2 ring-[var(--color-accent-400)]",
       )}
     >
@@ -174,18 +174,20 @@ export function DealKanban({ deals, customers }: DealKanbanProps) {
         />
       ) : (
         <>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
-            {KANBAN_STAGES.map((stage) => (
-              <Lane
-                key={stage}
-                stage={stage}
-                deals={grouped[stage]}
-                customers={customers}
-              />
-            ))}
+          <div className="-mx-4 px-4 md:-mx-8 md:px-8 lg:mx-0 lg:px-0">
+            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:grid lg:snap-none lg:grid-cols-5 lg:overflow-visible lg:pb-0">
+              {KANBAN_STAGES.map((stage) => (
+                <Lane
+                  key={stage}
+                  stage={stage}
+                  deals={grouped[stage]}
+                  customers={customers}
+                />
+              ))}
+            </div>
           </div>
           {activeId ? (
-            <div className="mt-3 grid gap-2 md:grid-cols-2">
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {TERMINAL_TARGETS.map((stage) => (
                 <TerminalDropZone
                   key={stage}

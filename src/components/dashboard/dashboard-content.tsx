@@ -15,9 +15,9 @@ export function DashboardContent() {
   const meta = useSettingsStore((s) => s.meta);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-ink-950)]">
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--color-ink-950)] md:text-3xl">
           ダッシュボード
         </h1>
         <p className="mt-1 text-sm text-[var(--color-ink-500)]">

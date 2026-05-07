@@ -234,7 +234,8 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                   <h2 className="mb-3 text-sm font-semibold text-[var(--color-ink-950)]">
                     明細
                   </h2>
-                  <table className="w-full text-sm">
+                  <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
+                  <table className="w-full min-w-[600px] text-sm">
                     <thead>
                       <tr className="border-b border-[var(--color-line)] text-left text-xs text-[var(--color-ink-500)]">
                         <th className="p-2 font-medium">品目</th>
@@ -265,6 +266,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                       ))}
                     </tbody>
                   </table>
+                  </div>
 
                   <div className="mt-4 flex justify-end">
                     <dl className="w-full max-w-xs space-y-2 text-sm">

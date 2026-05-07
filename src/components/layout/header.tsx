@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IndustrySwitcher } from "./industry-switcher";
+import { MobileNavTrigger } from "./mobile-nav";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useIndustry } from "@/hooks/use-industry";
 import { resetAllData } from "@/lib/store";
@@ -31,22 +32,24 @@ export function Header() {
   };
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-[var(--color-line)] bg-card px-4 md:px-6">
-      <div className="flex items-center gap-3">
-        <p className="text-sm font-semibold text-[var(--color-ink-950)]">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-[var(--color-line)] bg-card/95 px-3 backdrop-blur md:px-6">
+      <div className="flex items-center gap-2 min-w-0">
+        <MobileNavTrigger />
+        <p className="text-sm font-semibold text-[var(--color-ink-950)] truncate">
           統合業務ハブ
         </p>
-        <span className="hidden md:inline text-xs text-[var(--color-ink-500)]">
+        <span className="hidden lg:inline text-xs text-[var(--color-ink-500)] tabular-nums">
           {now}
         </span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <IndustrySwitcher />
         <Button
           variant="outline"
           size="sm"
           onClick={() => setResetOpen(true)}
           className="gap-1.5"
+          aria-label="現在の業種でデータをリセット"
         >
           <RefreshCw className="h-4 w-4" />
           <span className="hidden sm:inline">リセット</span>

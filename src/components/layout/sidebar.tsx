@@ -9,10 +9,18 @@ import {
   FileText,
   Receipt,
   Settings as SettingsIcon,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  exact?: boolean;
+};
+
+export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "ダッシュボード", icon: LayoutDashboard, exact: true },
   { href: "/customers", label: "顧客", icon: Users },
   { href: "/deals", label: "案件", icon: Briefcase },
@@ -21,9 +29,63 @@ const NAV_ITEMS = [
   { href: "/settings", label: "設定", icon: SettingsIcon },
 ];
 
-export function Sidebar() {
+type NavListProps = {
+  onNavigate?: () => void;
+  variant?: "desktop" | "mobile";
+};
+
+export function NavList({ onNavigate, variant = "desktop" }: NavListProps) {
   const pathname = usePathname();
 
+  return (
+    <nav
+      aria-label="メインナビゲーション"
+      className={cn(
+        "flex flex-col",
+        variant === "mobile" ? "gap-1 p-3" : "gap-1 p-3",
+      )}
+    >
+      {NAV_ITEMS.map((item) => {
+        const Icon = item.icon;
+        const active = item.exact
+          ? pathname === item.href
+          : pathname?.startsWith(item.href);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all",
+              active
+                ? "bg-[var(--color-accent-50)] text-[var(--color-accent-700)] shadow-sm"
+                : "text-[var(--color-ink-700)] hover:bg-[var(--color-bg-elevated)] hover:translate-x-0.5",
+            )}
+          >
+            {active ? (
+              <span
+                aria-hidden
+                className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-[var(--color-accent-600)]"
+              />
+            ) : null}
+            <Icon
+              className={cn(
+                "h-4 w-4 transition-transform",
+                active
+                  ? "text-[var(--color-accent-600)]"
+                  : "text-[var(--color-ink-500)] group-hover:text-[var(--color-accent-600)]",
+              )}
+            />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function Sidebar() {
   return (
     <aside className="hidden w-56 shrink-0 border-r border-[var(--color-line)] bg-[var(--color-bg-soft)] md:flex md:flex-col">
       <div className="px-5 py-4 border-b border-[var(--color-line)]">
@@ -34,29 +96,7 @@ export function Sidebar() {
           統合業務ハブ
         </p>
       </div>
-      <nav className="flex flex-col gap-1 p-3">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const active = item.exact
-            ? pathname === item.href
-            : pathname?.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                active
-                  ? "bg-[var(--color-accent-600)] text-white shadow-sm"
-                  : "text-[var(--color-ink-700)] hover:bg-[var(--color-bg-elevated)]",
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      <NavList />
       <div className="mt-auto border-t border-[var(--color-line)] px-5 py-3 text-[10px] text-[var(--color-ink-500)]">
         Demo · localStorage 完結
       </div>

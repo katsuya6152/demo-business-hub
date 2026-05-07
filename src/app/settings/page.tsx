@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { AppShell } from "@/components/layout/app-shell";
+import { Skeleton } from "@/components/shared/skeleton";
 import { useMounted } from "@/hooks/use-mounted";
 import { useSettingsStore } from "@/lib/store/settings";
 import { resetAllData, clearAllData } from "@/lib/store";
@@ -60,7 +61,15 @@ export default function SettingsPage() {
   if (!mounted) {
     return (
       <AppShell>
-        <p className="text-sm text-[var(--color-ink-500)]">読み込み中...</p>
+        <div className="max-w-3xl space-y-8">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-24" />
+            <Skeleton className="h-3 w-64" />
+          </div>
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-40 w-full rounded-xl" />
+          ))}
+        </div>
       </AppShell>
     );
   }

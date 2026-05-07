@@ -56,7 +56,7 @@ export default function CustomersPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-4 pb-20 sm:space-y-6 sm:pb-0">
         <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[var(--color-ink-950)]">
@@ -66,13 +66,17 @@ export default function CustomersPage() {
               {customers.length} 件登録 ・ 検索 / フィルタ / ソート可能
             </p>
           </div>
-          <Button onClick={() => setSheetOpen(true)}>
+          {/* Desktop / tablet only — mobile uses FAB */}
+          <Button
+            onClick={() => setSheetOpen(true)}
+            className="hidden sm:inline-flex"
+          >
             <Plus className="h-4 w-4" />
             新規顧客
           </Button>
         </header>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-ink-500)]" />
             <Input
@@ -89,7 +93,10 @@ export default function CustomersPage() {
               if (v) setStatusFilter(v as StatusFilter);
             }}
           >
-            <SelectTrigger className="w-full md:w-44">
+            <SelectTrigger
+              aria-label="ステータスでフィルタ"
+              className="w-full sm:w-44"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -138,6 +145,16 @@ export default function CustomersPage() {
           />
         )}
       </div>
+
+      {/* Mobile FAB */}
+      <button
+        type="button"
+        aria-label="新規顧客を追加"
+        onClick={() => setSheetOpen(true)}
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent-600)] text-white shadow-lg transition-transform hover:scale-105 active:translate-y-px sm:hidden"
+      >
+        <Plus className="h-6 w-6" />
+      </button>
 
       <CustomerSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </AppShell>

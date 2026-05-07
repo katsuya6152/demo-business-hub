@@ -208,8 +208,8 @@ export function QuoteEditor({ quote, defaultDealId }: QuoteEditorProps) {
   const itemsError = errors.items?.message ?? errors.items?.root?.message;
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <Card className="p-5">
+    <form id="quote-form" onSubmit={onSubmit} className="space-y-6">
+      <Card className="p-4 md:p-5">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="quote-number">見積番号</Label>
@@ -312,7 +312,7 @@ export function QuoteEditor({ quote, defaultDealId }: QuoteEditorProps) {
         </div>
       </Card>
 
-      <Card className="p-5">
+      <Card className="p-4 md:p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[var(--color-ink-950)]">
             明細
@@ -335,8 +335,8 @@ export function QuoteEditor({ quote, defaultDealId }: QuoteEditorProps) {
             行追加
           </Button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-separate border-spacing-0 text-sm">
+        <div className="-mx-4 overflow-x-auto md:mx-0">
+          <table className="w-full min-w-[640px] border-separate border-spacing-0 px-4 text-sm md:px-0">
             <thead>
               <tr className="border-b border-[var(--color-line)] text-left text-xs text-[var(--color-ink-500)]">
                 <th className="px-1.5 py-2 font-medium">品目</th>
@@ -392,7 +392,7 @@ export function QuoteEditor({ quote, defaultDealId }: QuoteEditorProps) {
         </div>
       </Card>
 
-      <Card className="p-5">
+      <Card className="p-4 md:p-5">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="quote-status">ステータス</Label>
@@ -430,16 +430,21 @@ export function QuoteEditor({ quote, defaultDealId }: QuoteEditorProps) {
         </div>
       </Card>
 
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
         <Button
           type="button"
           variant="outline"
           onClick={() => router.push("/quotes")}
+          className="w-full sm:w-auto"
         >
           <X className="h-4 w-4" />
           キャンセル
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto"
+        >
           <Save className="h-4 w-4" />
           {quote ? "保存" : "作成"}
         </Button>

@@ -20,7 +20,7 @@ export function PipelineSummary() {
   return (
     <Card className="p-5">
       <div className="mb-3">
-        <h3 className="text-sm font-semibold text-[var(--color-ink-950)]">
+        <h3 className="text-base font-semibold text-[var(--color-ink-950)]">
           案件パイプライン
         </h3>
         <p className="text-xs text-[var(--color-ink-500)]">

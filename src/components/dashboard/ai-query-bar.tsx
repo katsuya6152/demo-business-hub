@@ -80,11 +80,14 @@ export function AiQueryBar() {
   };
 
   return (
-    <Card className="border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] to-white p-5">
-      <div className="flex items-center gap-2">
-        <Sparkles className="h-5 w-5 text-[var(--color-accent-600)]" />
+    <Card className="relative overflow-hidden border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] via-white to-[var(--color-cyan-50)] p-5 ring-1 ring-[var(--color-accent-100)]">
+      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[var(--color-accent-100)] blur-3xl opacity-60" />
+      <div className="relative flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-[var(--color-accent-200)]">
+          <Sparkles className="h-4 w-4 text-[var(--color-accent-600)] animate-pulse" />
+        </span>
         <p className="text-sm font-semibold text-[var(--color-ink-950)]">
-          業務データに自然言語で質問できます
+          業務データに自然言語で質問
         </p>
         {history.length > 0 && (
           <button

@@ -23,7 +23,7 @@ export function InvoiceSummaryCards({ invoices }: InvoiceSummaryCardsProps) {
   const overdueTotal = overdueInvoiceTotal(invoices);
 
   return (
-    <div className="grid gap-3 md:grid-cols-3">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       <StatCard
         label="未入金"
         value={formatYen(unpaidTotal)}

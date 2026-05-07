@@ -330,8 +330,8 @@ export function InvoiceEditor({ invoice, initialValues }: InvoiceEditorProps) {
             行を追加
           </Button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-[var(--color-line)] text-left text-xs text-[var(--color-ink-500)]">
                 <th className="p-2 font-medium">品目</th>

@@ -39,7 +39,7 @@ export function DealList({ deals, customers }: DealListProps) {
 
   return (
     <div className="rounded-xl border border-[var(--color-line)] bg-card">
-      <Table>
+      <Table className="min-w-[640px]">
         <TableHeader>
           <TableRow>
             <TableHead>タイトル</TableHead>

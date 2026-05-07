@@ -51,6 +51,7 @@ export function KpiCards() {
     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
       <Link href="/invoices?status=paid&period=current-month" className="block">
         <StatCard
+          interactive
           label="今月売上"
           value={formatYen(thisMonth)}
           sub={
@@ -75,6 +76,7 @@ export function KpiCards() {
       </Link>
       <Link href="/invoices" className="block">
         <StatCard
+          interactive
           label="未入金"
           value={formatYen(unpaid)}
           sub={
@@ -92,6 +94,7 @@ export function KpiCards() {
       </Link>
       <Link href="/deals" className="block">
         <StatCard
+          interactive
           label="商談中"
           value={`${pipeline.length}件`}
           sub={`平均確度 ${avgProb}% / 想定 ${formatYen(
@@ -101,9 +104,10 @@ export function KpiCards() {
       </Link>
       <Link href="/customers" className="block">
         <StatCard
+          interactive
           label="新規顧客（今月）"
           value={`${newCustomers}社`}
-          sub="createdAt が当月のもの"
+          sub="今月登録された顧客"
         />
       </Link>
     </div>
