@@ -49,10 +49,17 @@ export function QuoteTable({
           const customer = customerById.get(q.customerId);
           return (
             <li key={q.id}>
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => router.push(`/quotes/${q.id}`)}
-                className="block w-full rounded-xl border border-[var(--color-line)] bg-card p-4 text-left shadow-sm transition-colors hover:bg-[var(--color-bg-soft)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    router.push(`/quotes/${q.id}`);
+                  }
+                }}
+                className="block w-full cursor-pointer rounded-xl border border-[var(--color-line)] bg-card p-4 text-left shadow-sm transition-colors hover:bg-[var(--color-bg-soft)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
@@ -75,7 +82,6 @@ export function QuoteTable({
                       <DropdownMenuTrigger
                         render={
                           <Button
-                            nativeButton={false}
                             variant="ghost"
                             size="icon-sm"
                             aria-label="操作"
@@ -109,7 +115,7 @@ export function QuoteTable({
                 <div className="mt-2 text-[11px] text-[var(--color-ink-500)]">
                   発行日：{fmtDate(q.issueDate)}
                 </div>
-              </button>
+              </div>
             </li>
           );
         })}
@@ -173,7 +179,6 @@ export function QuoteTable({
                       <DropdownMenuTrigger
                         render={
                           <Button
-                            nativeButton={false}
                             variant="ghost"
                             size="icon-sm"
                             aria-label="操作"
