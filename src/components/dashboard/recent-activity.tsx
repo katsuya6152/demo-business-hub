@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { useCustomersStore } from "@/lib/store/customers";
@@ -22,8 +23,14 @@ export function RecentActivity() {
   const invoices = useInvoicesStore((s) => s.invoices);
   const payments = usePaymentsStore((s) => s.payments);
 
-  const customerNameById = new Map(customers.map((c) => [c.id, c.name]));
-  const invoiceById = new Map(invoices.map((i) => [i.id, i]));
+  const customerNameById = useMemo(
+    () => new Map(customers.map((c) => [c.id, c.name])),
+    [customers],
+  );
+  const invoiceById = useMemo(
+    () => new Map(invoices.map((i) => [i.id, i])),
+    [invoices],
+  );
 
   const items: ActivityItem[] = [];
 

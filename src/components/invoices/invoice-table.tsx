@@ -130,11 +130,11 @@ export function InvoiceTable({
                           variant="ghost"
                           size="icon-sm"
                           aria-label="メニュー"
-                        />
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
                       }
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </DropdownMenuTrigger>
+                    />
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         onClick={() => onPay(inv)}

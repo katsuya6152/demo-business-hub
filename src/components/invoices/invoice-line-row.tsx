@@ -28,6 +28,7 @@ export function InvoiceLineRow({
           value={item.description}
           onChange={(e) => onChange({ description: e.target.value })}
           placeholder="品目"
+          aria-label="品目"
           className="w-full"
         />
       </td>
@@ -40,6 +41,7 @@ export function InvoiceLineRow({
           }
           min={0}
           step="any"
+          aria-label="数量"
           className="w-20 text-right tabular-nums"
         />
       </td>
@@ -48,6 +50,7 @@ export function InvoiceLineRow({
           value={item.unit}
           onChange={(e) => onChange({ unit: e.target.value })}
           placeholder="式"
+          aria-label="単位"
           className="w-16"
         />
       </td>
@@ -60,6 +63,7 @@ export function InvoiceLineRow({
           }
           min={0}
           step="any"
+          aria-label="単価"
           className="w-28 text-right tabular-nums"
         />
       </td>

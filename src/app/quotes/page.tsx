@@ -113,6 +113,7 @@ export default function QuotesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="番号・件名・顧客名で検索"
+              aria-label="見積検索"
               className="pl-8"
             />
           </div>

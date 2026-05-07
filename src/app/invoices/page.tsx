@@ -95,6 +95,7 @@ export default function InvoicesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="番号 / 件名 / 顧客で検索"
+              aria-label="請求検索"
               className="pl-9"
             />
           </div>

@@ -79,6 +79,7 @@ export default function CustomersPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="顧客名 / 担当者 / メールで検索"
+              aria-label="顧客検索"
               className="pl-9"
             />
           </div>

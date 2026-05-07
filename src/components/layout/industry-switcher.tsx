@@ -40,7 +40,7 @@ export function IndustrySwitcher() {
   return (
     <>
       <Select value={industry} onValueChange={handleChange}>
-        <SelectTrigger className="w-48 bg-card">
+        <SelectTrigger className="w-48 bg-card" aria-label="業種を切り替える">
           <SelectValue>
             <span className="mr-2">{INDUSTRY_EMOJIS[industry]}</span>
             {INDUSTRY_LABELS[industry]}

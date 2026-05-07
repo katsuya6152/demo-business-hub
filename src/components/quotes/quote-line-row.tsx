@@ -36,6 +36,7 @@ export function QuoteLineRow({
         <Input
           {...register(`items.${index}.description`)}
           placeholder="品目・サービス名"
+          aria-label={`品目 ${index + 1}`}
           aria-invalid={errorMessage ? true : undefined}
         />
         {errorMessage ? (
@@ -47,6 +48,7 @@ export function QuoteLineRow({
           type="number"
           step="0.1"
           min={0}
+          aria-label={`数量 ${index + 1}`}
           className="text-right tabular-nums"
           {...register(`items.${index}.quantity`, { valueAsNumber: true })}
         />
@@ -55,6 +57,7 @@ export function QuoteLineRow({
         <Input
           {...register(`items.${index}.unit`)}
           placeholder="式"
+          aria-label={`単位 ${index + 1}`}
         />
       </td>
       <td className="p-1.5 w-32">
@@ -62,6 +65,7 @@ export function QuoteLineRow({
           type="number"
           step="100"
           min={0}
+          aria-label={`単価 ${index + 1}`}
           className="text-right tabular-nums"
           {...register(`items.${index}.unitPrice`, { valueAsNumber: true })}
         />
