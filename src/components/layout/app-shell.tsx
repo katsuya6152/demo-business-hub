@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { MobileBottomNav } from "./mobile-bottom-nav";
+import { ContactBanner } from "./contact-banner";
 import { CommandPaletteProvider } from "@/components/command-palette/command-palette-provider";
 import { KeyboardShortcutsDialog } from "@/components/shared/keyboard-shortcuts-dialog";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
@@ -23,6 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </main>
         </div>
         <MobileBottomNav />
+        <ContactBanner />
       </div>
       <KeyboardShortcutsDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </CommandPaletteProvider>

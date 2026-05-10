@@ -3,15 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Users,
+  ArrowUpRight,
   Briefcase,
   FileText,
+  LayoutDashboard,
   Receipt,
   Settings as SettingsIcon,
+  Sparkles,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CONTACT_COPY, CONTACT_URL } from "@/lib/constants/contact";
 
 type NavItem = {
   href: string;
@@ -87,7 +90,7 @@ export function NavList({ onNavigate, variant = "desktop" }: NavListProps) {
 
 export function Sidebar() {
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-[var(--color-line)] bg-[var(--color-bg-soft)] lg:flex lg:flex-col">
+    <aside className="sticky top-0 hidden h-screen w-56 shrink-0 self-start overflow-y-auto border-r border-[var(--color-line)] bg-[var(--color-bg-soft)] lg:flex lg:flex-col">
       <div className="px-5 py-4 border-b border-[var(--color-line)]">
         <p className="text-xs uppercase tracking-wider text-[var(--color-ink-500)]">
           Business Hub
@@ -97,8 +100,39 @@ export function Sidebar() {
         </p>
       </div>
       <NavList />
-      <div className="mt-auto border-t border-[var(--color-line)] px-5 py-3 text-[10px] text-[var(--color-ink-500)]">
-        Demo · localStorage 完結
+      <div className="mt-auto flex flex-col gap-3 border-t border-[var(--color-line)] p-4">
+        <a
+          href={CONTACT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative overflow-hidden rounded-xl border border-[var(--color-accent-200)] bg-gradient-to-br from-[var(--color-accent-50)] via-card to-[var(--color-cyan-50)] p-3.5 transition-all hover:-translate-y-0.5 hover:border-[var(--color-accent-300)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-300)]"
+        >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-4 -top-4 h-16 w-16 rounded-full bg-[var(--color-accent-100)] opacity-50 blur-xl transition-opacity group-hover:opacity-80"
+          />
+          <div className="relative">
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="h-3 w-3 text-[var(--color-accent-600)]" />
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent-700)]">
+                For Business
+              </p>
+            </div>
+            <p className="mt-1.5 text-[13px] font-bold leading-snug text-[var(--color-ink-950)]">
+              {CONTACT_COPY.sidebarHeadline}
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-ink-600)]">
+              {CONTACT_COPY.sidebarSub}
+            </p>
+            <div className="mt-2.5 inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--color-accent-700)]">
+              {CONTACT_COPY.sidebarCta}
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </div>
+          </div>
+        </a>
+        <p className="text-[10px] text-[var(--color-ink-500)]">
+          Demo · localStorage 完結
+        </p>
       </div>
     </aside>
   );

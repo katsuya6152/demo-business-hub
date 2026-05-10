@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { RefreshCw } from "lucide-react";
+import { ArrowUpRight, MessageCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IndustrySwitcher } from "./industry-switcher";
 import { MobileNavTrigger } from "./mobile-nav";
@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { useIndustry } from "@/hooks/use-industry";
 import { resetAllData } from "@/lib/store";
 import { INDUSTRY_LABELS } from "@/lib/types/industry";
+import { CONTACT_COPY, CONTACT_URL } from "@/lib/constants/contact";
 import { toast } from "sonner";
 
 export function Header() {
@@ -58,6 +59,17 @@ export function Header() {
           <RefreshCw className="h-4 w-4" />
           <span className="hidden sm:inline">リセット</span>
         </Button>
+        <a
+          href={CONTACT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={CONTACT_COPY.headerLabelMobileAria}
+          className="group relative inline-flex h-9 items-center gap-1.5 rounded-md bg-[var(--color-accent-600)] px-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[var(--color-accent-700)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-300)] focus-visible:ring-offset-2 sm:px-3"
+        >
+          <MessageCircle className="h-4 w-4 sm:hidden" />
+          <span className="hidden sm:inline">{CONTACT_COPY.headerLabel}</span>
+          <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 hidden sm:inline-block" />
+        </a>
       </div>
       <ConfirmDialog
         open={resetOpen}
