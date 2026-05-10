@@ -2,18 +2,12 @@
 
 import { use, useMemo, useState } from "react";
 import Link from "next/link";
-import { FileDown, MoreVertical, Printer, Receipt, Save } from "lucide-react";
+import { FileDown, Printer, Receipt } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/shared/empty-state";
 import {
   DetailBackLink,
@@ -117,83 +111,7 @@ export default function QuoteDetailPage({
     <>
       <AppShell>
         <div className="space-y-6 screen-only">
-          <div className="sticky top-14 z-10 -mx-4 border-b border-[var(--color-line)] bg-background/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <DetailBackLink href="/quotes" label="見積一覧へ" />
-              <div className="flex items-center gap-2">
-                {/* Desktop: full actions */}
-                <Link
-                  href={`/invoices/new?quoteId=${quote.id}`}
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "sm" }),
-                    "hidden md:inline-flex",
-                  )}
-                >
-                  <Receipt className="h-4 w-4" />
-                  請求書を作成
-                </Link>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownloadPdf}
-                  disabled={downloadingPdf}
-                  className="hidden md:inline-flex"
-                >
-                  <FileDown className="h-4 w-4" />
-                  {downloadingPdf ? "生成中..." : "PDF"}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrint}
-                  className="hidden md:inline-flex"
-                >
-                  <Printer className="h-4 w-4" />
-                  印刷
-                </Button>
-                <Button type="submit" form="quote-form" size="sm">
-                  <Save className="h-4 w-4" />
-                  保存
-                </Button>
-                {/* Mobile: overflow menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger
-                    render={
-                      <Button
-                        variant="outline"
-                        size="icon-sm"
-                        aria-label="その他の操作"
-                        className="md:hidden"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    }
-                  />
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={handleDownloadPdf}
-                      disabled={downloadingPdf}
-                    >
-                      <FileDown className="h-4 w-4" />
-                      {downloadingPdf ? "PDF生成中..." : "PDF ダウンロード"}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handlePrint}>
-                      <Printer className="h-4 w-4" />
-                      印刷
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      render={
-                        <Link href={`/invoices/new?quoteId=${quote.id}`} />
-                      }
-                    >
-                      <Receipt className="h-4 w-4" />
-                      請求書を作成
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </div>
+          <DetailBackLink href="/quotes" label="見積一覧へ" />
 
           <DetailHeader
             eyebrow={quote.number}
@@ -211,6 +129,32 @@ export default function QuoteDetailPage({
               )
             }
             badges={<QuoteStatusBadge status={quote.status} />}
+            actions={
+              <>
+                <Link
+                  href={`/invoices/new?quoteId=${quote.id}`}
+                  className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                >
+                  <Receipt className="h-4 w-4" />
+                  <span className="hidden sm:inline">請求書を作成</span>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadPdf}
+                  disabled={downloadingPdf}
+                >
+                  <FileDown className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {downloadingPdf ? "生成中..." : "PDF"}
+                  </span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={handlePrint}>
+                  <Printer className="h-4 w-4" />
+                  <span className="hidden sm:inline">印刷</span>
+                </Button>
+              </>
+            }
           />
 
           <QuoteEditor quote={quote} />
