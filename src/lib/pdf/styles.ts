@@ -9,20 +9,23 @@ import { Font, StyleSheet } from "@react-pdf/renderer";
 // Register Noto Sans JP for Japanese text.
 // Files are bundled under /public/fonts and served from the same origin
 // to avoid third-party CDN URL drift (Google Fonts subset hashes change).
-// In the browser, @react-pdf/renderer fetches `src` via fetch() so a
-// relative path resolves against window.location.
+// In the browser, @react-pdf/renderer fetches `src` via fetch() so the URL
+// must be absolute and include Next.js basePath (e.g. "/business-hub").
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 function fontUrl(file: string): string {
+  const path = `${BASE_PATH}${file}`;
   if (typeof window !== "undefined") {
-    return new URL(file, window.location.origin).toString();
+    return new URL(path, window.location.origin).toString();
   }
-  return file;
+  return path;
 }
 
 Font.register({
   family: "Noto Sans JP",
   fonts: [
-    { src: fontUrl("/fonts/NotoSansJP-Regular.woff2"), fontWeight: 400 },
-    { src: fontUrl("/fonts/NotoSansJP-Bold.woff2"), fontWeight: 700 },
+    { src: fontUrl("/fonts/NotoSansJP-Regular.otf"), fontWeight: 400 },
+    { src: fontUrl("/fonts/NotoSansJP-Bold.otf"), fontWeight: 700 },
   ],
 });
 
@@ -162,7 +165,7 @@ export const pdfStyles = StyleSheet.create({
     paddingHorizontal: 6,
     fontSize: 9,
   },
-  colDescription: { flex: 1 },
+  colDescription: { width: 290 },
   colQty: { width: 50, textAlign: "right" },
   colUnit: { width: 40 },
   colUnitPrice: { width: 75, textAlign: "right" },

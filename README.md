@@ -125,36 +125,34 @@ src/
 3. `src/lib/ai/responder.ts` が選ばれたパターンに対応する集計関数を呼んでマークダウンの回答を生成
 4. UI でローディング演出 (600〜1200ms) を経て、`react-markdown` で表示
 
-## Vercel デプロイ手順
+## デプロイ構成
 
-### 初回セットアップ
+`https://demo.katsuya-suzuki.dev/business-hub` で公開する前提で `next.config.ts` に
+`basePath: "/business-hub"` を設定済み。`NEXT_PUBLIC_BASE_PATH` 環境変数で上書き可能。
 
-```bash
-# プロジェクトルートで
-npx vercel link        # プロジェクトと紐付け（初回のみ）
-npx vercel --prod      # 本番デプロイ
-```
+### Vercel 設定（Web UI から行う想定）
 
-### サブドメイン設定
+1. **Import Project**: GitHub リポジトリを Vercel で Import
+2. **Framework**: Next.js（自動検出）
+3. **Build Command**: `pnpm build`（プリセット）
+4. **Install Command**: `pnpm install`
+5. **Node.js Version**: 20.x 以上
+6. **環境変数**: 不要（モック実装のため）。サブパスを変える場合のみ `NEXT_PUBLIC_BASE_PATH` を設定。
+7. **Custom Domain**: `demo.katsuya-suzuki.dev` を追加
 
-1. Vercel ダッシュボード → プロジェクト → Settings → Domains
-2. `demo.katsuya-suzuki.dev` を追加
-3. Cloudflare（または使用中の DNS プロバイダ）で `demo` サブドメインの CNAME を Vercel が指示する値に設定
-4. SSL は Vercel 側で自動発行
+### Cloudflare DNS 設定
 
-### 設定項目（参考）
+Vercel が指示する CNAME ターゲット（通常 `cname.vercel-dns.com`）を Cloudflare に登録:
 
-- **Build Command**: `pnpm build`
-- **Install Command**: `pnpm install`
-- **Output Directory**: `.next`
-- **Node.js Version**: 20.x
-- **環境変数**: 不要（モック実装のため）
+| Type | Name | Target | Proxy |
+|---|---|---|---|
+| CNAME | demo | `cname.vercel-dns.com` | DNS only（オレンジ雲オフ）推奨 |
+
+> **Proxy オン（オレンジ雲）にすると Vercel の自動 HTTPS 発行が失敗するため、初回検証は DNS only で行う。** 落ち着いてから Proxy オン + "Full (Strict)" SSL に切り替え可能。
 
 ### 以降のデプロイ
 
-```bash
-git push origin main   # main へ push すると Vercel が自動デプロイ
-```
+GitHub `main` ブランチへの push で Vercel が自動デプロイ。
 
 ## 完了の定義
 

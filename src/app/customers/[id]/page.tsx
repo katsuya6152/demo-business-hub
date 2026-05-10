@@ -297,23 +297,23 @@ export default function CustomerDetailPage({
           <Tabs defaultValue="deals">
             <TabsList
               variant="line"
-              className="-mx-1 inline-flex h-auto w-full gap-1 overflow-x-auto rounded-full border border-[var(--color-line)] bg-[var(--color-bg-soft)] p-1 sm:w-fit"
+              className="h-auto w-full gap-0 overflow-x-auto border-b border-[var(--color-line)] bg-transparent p-0 [-ms-overflow-style:none] [scrollbar-width:none] sm:w-fit sm:gap-1 [&::-webkit-scrollbar]:hidden"
             >
-              <PillTab
+              <RelatedTab
                 value="deals"
-                icon={<Briefcase className="h-3.5 w-3.5" />}
+                icon={<Briefcase className="h-4 w-4" />}
                 label="関連案件"
                 count={customerDeals.length}
               />
-              <PillTab
+              <RelatedTab
                 value="quotes"
-                icon={<FileText className="h-3.5 w-3.5" />}
+                icon={<FileText className="h-4 w-4" />}
                 label="見積"
                 count={customerQuotes.length}
               />
-              <PillTab
+              <RelatedTab
                 value="invoices"
-                icon={<Receipt className="h-3.5 w-3.5" />}
+                icon={<Receipt className="h-4 w-4" />}
                 label="請求"
                 count={customerInvoices.length}
               />
@@ -392,7 +392,7 @@ export default function CustomerDetailPage({
   );
 }
 
-function PillTab({
+function RelatedTab({
   value,
   icon,
   label,
@@ -407,20 +407,24 @@ function PillTab({
     <TabsTrigger
       value={value}
       className={cn(
-        "shrink-0 gap-1.5 rounded-full border-transparent px-3 py-1.5 text-xs font-medium text-[var(--color-ink-500)]",
-        "transition-colors",
-        "hover:bg-card/60 hover:text-[var(--color-ink-950)]",
-        "data-active:bg-card data-active:text-[var(--color-accent-700)] data-active:shadow-sm",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-300)]",
+        "group/tab relative shrink-0 gap-2 rounded-none border-0 px-4 py-2.5 text-sm font-medium",
+        "text-[var(--color-ink-500)] transition-colors",
+        "hover:text-[var(--color-ink-950)]",
+        "data-active:text-[var(--color-accent-700)]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-300)] focus-visible:ring-offset-2",
+        "after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:rounded-full after:bg-[var(--color-accent-600)] after:opacity-0 after:transition-opacity",
+        "data-active:after:opacity-100",
       )}
     >
-      {icon}
+      <span className="text-[var(--color-ink-400)] transition-colors group-data-active/tab:text-[var(--color-accent-600)]">
+        {icon}
+      </span>
       <span>{label}</span>
       <span
         className={cn(
-          "rounded-full px-1.5 py-px text-[10px] font-mono tabular-nums",
-          "bg-[var(--color-bg-elevated)] text-[var(--color-ink-700)]",
-          "group-data-[state=active]/tab:bg-[var(--color-accent-100)] group-data-[state=active]/tab:text-[var(--color-accent-700)]",
+          "ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold tabular-nums leading-none",
+          "bg-[var(--color-bg-soft)] text-[var(--color-ink-600)] transition-colors",
+          "group-data-active/tab:bg-[var(--color-accent-100)] group-data-active/tab:text-[var(--color-accent-700)]",
         )}
       >
         {count}

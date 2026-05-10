@@ -115,7 +115,7 @@ export function QuotePdf({ quote, customer, company }: QuotePdfProps) {
                 {item.description}
               </Text>
               <Text style={[pdfStyles.td, pdfStyles.colQty]}>
-                {item.quantity}
+                {String(item.quantity)}
               </Text>
               <Text style={[pdfStyles.td, pdfStyles.colUnit]}>{item.unit}</Text>
               <Text style={[pdfStyles.td, pdfStyles.colUnitPrice]}>
