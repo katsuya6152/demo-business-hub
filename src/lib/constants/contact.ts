@@ -1,4 +1,4 @@
-export const CONTACT_URL = "https://katsuya-suzuki.dev/contact";
+export const CONTACT_URL = "https://katsuya-suzuki.dev/?src=demo#contact";
 
 // Single source of truth for CTA copy across surfaces.
 export const CONTACT_COPY = {
